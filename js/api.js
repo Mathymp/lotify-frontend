@@ -1,7 +1,7 @@
 // =========================================================================
-// ⚠️ 1. CAMBIA ESTA URL POR LA URL PÚBLICA DE TU API (Backend)
+// ⚠️ 1. URL PÚBLICA DE TU API (Backend)
 // =========================================================================
-const API_URL = 'https://lotify-backend.onrender.com/api'; // <--- URL PÚBLICA DEL BACKEND
+const API_URL = 'https://lotify-backend.onrender.com/api'; // <--- ESTA ES LA URL CORRECTA
 // =========================================================================
 
 const getToken = () => localStorage.getItem('userToken');
@@ -69,6 +69,11 @@ async function loginUser(email, password) {
   });
   if (!data.token) throw new Error('Error: El servidor no devolvió un token válido.');
   return data;
+}
+
+// NUEVA FUNCIÓN NECESARIA POR DASHBOARD.HTML
+async function getMe() {
+  return await safeFetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
 }
 
 // --- FUNCIONES DE PROYECTOS ---
