@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba 360 (Aislada)</title>
+    
+    <!-- CSS de la V5 (del link que encontraste) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@5/dist/index.min.css">
+    
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        #viewer {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="viewer"></div>
+
+    <!-- 
+    ==================================================================
+    SCRIPTS (¡AL FINAL!)
+    ================================================================== 
+    -->
+
+    <!-- JS de la V5 (del link que encontraste) -->
+    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@5/dist/index.min.js"></script>
+
+    <script>
+        // Esperamos a que la página cargue
+        window.addEventListener('load', () => {
+
+            // Verificamos que la librería cargó
+            if (typeof window.photoSphereViewer === 'undefined') {
+                document.getElementById('viewer').innerHTML = 'Error: La librería (desde CDN) no se pudo cargar. Revisa la consola (F12).';
+            } else {
+                
+                const { Viewer } = window.photoSphereViewer;
+
+                // ¡Iniciamos el visor!
+                new Viewer({
+                    container: document.getElementById('viewer'),
+                    // Una foto de prueba de internet
+                    panorama: 'https://photo-sphere-viewer.js.org/assets/sphere.jpg',
+                    caption: '¡Si ves esto, SÍ FUNCIONA!',
+                    navbar: ['zoom', 'fullscreen', 'caption']
+                });
+            }
+        });
+    </script>
+</body>
+</html>

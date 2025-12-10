@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipo - LOTIFY</title>
+    <link rel="icon" type="image/png" href="fav.png.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .badge-rol {
+            padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .rol-admin { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .rol-vendedor { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        
+        .avatar-small {
+            width: 32px; height: 32px; background: #f1f5f9; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #64748b; font-size: 0.8rem; border: 1px solid #e2e8f0;
+        }
+        
+        .btn-icon-action {
+            width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 5px;
+        }
+        .btn-edit { background: #eff6ff; color: #2563eb; }
+        .btn-edit:hover { background: #2563eb; color: white; transform: translateY(-2px); }
+        .btn-del { background: #fee2e2; color: #ef4444; }
+        .btn-del:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+
+        .btn-danger-action {
+            background: #ef4444; color: white; border: none; padding: 10px 20px; 
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .btn-danger-action:hover { background: #dc2626; }
+
+        /* Estilos Ojito Password */
+        .input-wrapper { position: relative; width: 100%; }
+        .toggle-password-icon {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; font-size: 1.1rem; cursor: pointer; transition: color 0.2s; z-index: 10;
+        }
+        .toggle-password-icon:hover { color: #2563eb; }
+        /* Ajuste para input con icono */
+        .styled-input-pass { padding-right: 40px !important; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><a href="dashboard.html" class="logo-text" style="text-decoration:none;"><i class="bi bi-bounding-box-circles"></i> LOTI<span>FY</span></a></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="sidebar-link"><i class="bi bi-grid-fill"></i> Mis Proyectos</a></li>
+                <li><a href="gestion-lotes.html" class="sidebar-link"><i class="bi bi-list-check"></i> Gestión Lotes</a></li>
+                <li><a href="clientes.html" class="sidebar-link"><i class="bi bi-people"></i> Clientes</a></li>
+                <li><a href="ventas.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i> Ventas & Visitas</a></li>
+                <li><a href="configuracion.html" class="sidebar-link"><i class="bi bi-gear"></i> Configuración</a></li>
+                <li><a href="#" class="sidebar-link active"><i class="bi bi-shield-lock-fill"></i> Equipo</a></li>
+
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="localStorage.removeItem('userToken');window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Salir</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="page-title">Gestión de Equipo</h1>
+                    <p style="color:#64748b;">Administra usuarios y permisos.</p>
+                </div>
+                <button class="btn-primary-block" style="width: auto; margin:0;" onclick="openModal('user')">
+                    <i class="bi bi-person-plus-fill"></i> Nuevo Usuario
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="management-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Fecha Alta</th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team-tbody">
+                        <tr><td colspan="5" style="text-align:center; padding:30px;">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-user" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Registrar Nuevo Miembro</h3>
+                <button class="btn-close" onclick="closeModal('user')"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="form-user">
+                <input type="hidden" id="edit-user-id" name="id">
+                <div class="modal-body">
+                    <div id="modal-alert" class="alert alert-danger hidden" style="padding:10px; font-size:0.9rem;"></div>
+
+                    <div class="input-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" class="styled-input" id="input-nombre" name="nombre_usuario" required placeholder="Ej. Camila Ventas">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" class="styled-input" id="input-email" name="email" required placeholder="camila@empresa.cl">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label id="label-pass">Contraseña</label>
+                            <div class="input-wrapper">
+                                <input type="password" class="styled-input styled-input-pass" id="input-pass" name="password" required placeholder="••••••">
+                                <i class="bi bi-eye-slash toggle-password-icon" id="togglePassword"></i>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Rol / Permisos</label>
+                            <select class="styled-input" name="rol" id="input-rol">
+                                <option value="vendedor">Vendedor</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px dashed #cbd5e1; font-size:0.8rem; color:#64748b; margin-top:10px;">
+                        <i class="bi bi-info-circle-fill"></i> <strong>Nota:</strong> Los vendedores pueden registrar clientes y ventas, pero no borrar proyectos.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('user')">Cancelar</button>
+                    <button type="submit" class="btn-primary-block" style="width:auto; margin:0;" id="btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-delete" class="modal-overlay">
+        <div class="modal-card" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 style="color:#ef4444;"><i class="bi bi-exclamation-triangle-fill"></i> Eliminar Usuario</h3>
+                <button class="btn-close" onclick="closeModal('delete')"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-weight:600; color:#1e293b; margin-bottom:5px;">¿Estás seguro de eliminar a este miembro?</p>
+                <p style="font-size: 0.9rem; color: #64748b;">Esta acción revocará su acceso inmediatamente.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('delete')">Cancelar</button>
+                <button type="button" class="btn-danger-action" id="btn-confirm-delete" onclick="confirmDelete()">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-feedback" class="modal-overlay">
+        <div class="modal-card" style="max-width: 350px; text-align: center;">
+            <div class="modal-body" style="padding-top: 30px;">
+                <div id="feedback-icon-container" style="margin-bottom: 15px;">
+                    <i id="feedback-icon" class="bi" style="font-size: 3.5rem;"></i>
+                </div>
+                <h3 id="feedback-title" style="margin: 10px 0; color:#0f172a;">Título</h3>
+                <p id="feedback-msg" style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Mensaje</p>
+                <button class="btn-primary-block" onclick="closeModal('feedback')">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const token = localStorage.getItem('userToken');
+        if(!token) window.location.href = 'index.html';
+        
+        let currentUserId = null;
+        let userToDeleteId = null;
+        let allUsers = []; // Cache local para edición
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            currentUserId = payload.id;
+        } catch(e){}
+
+        // --- LÓGICA DEL OJITO (PASSWORD) ---
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('input-pass');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+
+        // --- GESTIÓN DE MODALES ---
+        function openModal(type, id = null) {
+            if (type === 'user') {
+                const form = document.getElementById('form-user');
+                const title = document.getElementById('modal-title');
+                const btn = document.getElementById('btn-save');
+                const idInput = document.getElementById('edit-user-id');
+                const passInput = document.getElementById('input-pass');
+                const passLabel = document.getElementById('label-pass');
+
+                form.reset();
+                document.getElementById('modal-alert').classList.add('hidden');
+                
+                // Reset password visibility
+                passInput.setAttribute('type', 'password');
+                togglePassword.classList.remove('bi-eye');
+                togglePassword.classList.add('bi-eye-slash');
+
+                if (id) {
+                    // MODO EDICIÓN
+                    const user = allUsers.find(u => u.id === id);
+                    if (!user) return;
+
+                    title.innerText = "Editar Miembro";
+                    btn.innerText = "Guardar Cambios";
+                    idInput.value = user.id;
+                    
+                    document.getElementById('input-nombre').value = user.nombre_usuario;
+                    document.getElementById('input-email').value = user.email;
+                    document.getElementById('input-rol').value = user.rol;
+
+                    // Ajustes de contraseña para edición
+                    passInput.required = false;
+                    passInput.placeholder = "Dejar vacía para mantener";
+                    passLabel.innerText = "Nueva Contraseña (Opcional)";
+
+                } else {
+                    // MODO CREACIÓN
+                    title.innerText = "Registrar Nuevo Miembro";
+                    btn.innerText = "Crear Usuario";
+                    idInput.value = "";
+                    
+                    passInput.required = true;
+                    passInput.placeholder = "••••••";
+                    passLabel.innerText = "Contraseña";
+                }
+
+                document.getElementById('modal-user').classList.add('show');
+
+            } else if (type === 'delete') {
+                userToDeleteId = id;
+                document.getElementById('modal-delete').classList.add('show');
+            }
+        }
+
+        function closeModal(type) {
+            document.getElementById(`modal-${type}`).classList.remove('show');
+            if (type === 'delete') userToDeleteId = null;
+        }
+
+        function showFeedback(type, title, msg) {
+            const icon = document.getElementById('feedback-icon');
+            const titleEl = document.getElementById('feedback-title');
+            const msgEl = document.getElementById('feedback-msg');
+
+            if (type === 'success') {
+                icon.className = 'bi bi-check-circle-fill';
+                icon.style.color = '#10b981';
+                titleEl.innerText = title || '¡Éxito!';
+            } else {
+                icon.className = 'bi bi-x-circle-fill';
+                icon.style.color = '#ef4444';
+                titleEl.innerText = title || 'Error';
+            }
+            msgEl.innerText = msg;
+            document.getElementById('modal-feedback').classList.add('show');
+        }
+
+        async function loadTeam() {
+            try {
+                const res = await fetch('http://localhost:3000/api/auth/team', { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                
+                if(res.status === 403) {
+                    document.querySelector('.admin-content').innerHTML = '<div class="alert alert-danger" style="margin:20px;">⛔ Acceso denegado.</div>';
+                    return;
+                }
+
+                allUsers = await res.json(); // Guardamos en cache
+                const tbody = document.getElementById('team-tbody');
+                tbody.innerHTML = '';
+
+                if(allUsers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay usuarios.</td></tr>';
+                    return;
+                }
+
+                allUsers.forEach(u => {
+                    const isMe = u.id === currentUserId;
+                    const inicial = u.nombre_usuario.charAt(0).toUpperCase();
+                    const rolClass = u.rol === 'admin' ? 'rol-admin' : 'rol-vendedor';
+                    
+                    let actions = '';
+                    if (!isMe) {
+                        actions = `
+                            <button class="btn-icon-action btn-edit" onclick="openModal('user', ${u.id})" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn-icon-action btn-del" onclick="openModal('delete', ${u.id})" title="Eliminar"><i class="bi bi-trash-fill"></i></button>
+                        `;
+                    } else {
+                        actions = `<span style="color:#94a3b8; font-size:0.8rem; font-style:italic;">(Tú)</span>`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div class="avatar-small">${inicial}</div>
+                                    <span style="font-weight:600; color:#0f172a;">${u.nombre_usuario}</span>
+                                </div>
+                            </td>
+                            <td style="color:#64748b;">${u.email}</td>
+                            <td><span class="badge-rol ${rolClass}">${u.rol || 'admin'}</span></td>
+                            <td style="color:#94a3b8; font-size:0.85rem;">${new Date(u.creado_en).toLocaleDateString()}</td>
+                            <td style="text-align:center; display:flex; justify-content:center;">${actions}</td>
+                        </tr>
+                    `;
+                });
+
+            } catch (e) { console.error(e); }
+        }
+
+        async function confirmDelete() {
+            if(!userToDeleteId) return;
+            const btn = document.getElementById('btn-confirm-delete');
+            const originalText = btn.innerText;
+            btn.innerText = '...'; btn.disabled = true;
+
+            try {
+                const res = await fetch(`http://localhost:3000/api/auth/team/${userToDeleteId}`, {
+                    method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(!res.ok) throw new Error('Error al eliminar');
+                
+                closeModal('delete');
+                showFeedback('success', 'Eliminado', 'Usuario eliminado correctamente.');
+                loadTeam();
+            } catch (err) { 
+                closeModal('delete');
+                showFeedback('error', 'Error', err.message);
+            } finally { btn.innerText = originalText; btn.disabled = false; }
+        }
+
+        document.getElementById('form-user').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save');
+            const alertBox = document.getElementById('modal-alert');
+            const originalText = btn.innerText;
+            const editId = document.getElementById('edit-user-id').value;
+
+            btn.disabled = true; btn.innerText = 'Procesando...';
+            alertBox.classList.add('hidden');
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                let url = 'http://localhost:3000/api/auth/team';
+                let method = 'POST';
+
+                if (editId) {
+                    url += `/${editId}`;
+                    method = 'PUT'; // Cambio a PUT para editar
+                }
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+
+                const json = await res.json();
+                if(!res.ok) throw new Error(json.message || 'Error');
+
+                closeModal('user');
+                showFeedback('success', '¡Listo!', editId ? 'Usuario actualizado.' : 'Usuario creado.');
+                loadTeam();
+
+            } catch(err) {
+                alertBox.innerText = err.message;
+                alertBox.classList.remove('hidden');
+            } finally { btn.disabled = false; btn.innerText = originalText; }
+        });
+
+        loadTeam();
+    </script>
+</body>
+</html>

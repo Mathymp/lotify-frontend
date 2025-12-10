@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LOTIFY</title>
+    <link rel="icon" type="image/png" href="fav.png.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* CLASES DE CONTROL DE ROL - CRÍTICO */
+        .admin-only { display: none !important; }
+        .admin-only-menu { display: none !important; }
+
+        /* ESTILOS DE TARJETAS Y ACCIONES */
+        .projects-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+        }
+        
+        .project-card { 
+            display: flex; 
+            flex-direction: column; 
+            background: white; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+            border: 1px solid #e2e8f0; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+        
+        .project-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+            border-color: #cbd5e1;
+        }
+        
+        .card-img-top { 
+            height: 160px; 
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+        
+        .card-img-top img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover .card-img-top img {
+            transform: scale(1.05);
+        }
+        
+        .card-body {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .project-date {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .project-title { 
+            font-size: 1rem; 
+            font-weight: 600; 
+            color: #0f172a; 
+            margin: 0 0 8px 0; 
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .project-desc { 
+            font-size: 0.85rem; 
+            color: #64748b; 
+            margin-bottom: 16px; 
+            flex-grow: 1;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .card-actions { 
+            margin-top: auto; 
+            padding-top: 16px; 
+            border-top: 1px solid #f1f5f9; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        
+        .action-group-main { 
+            display: flex; 
+            gap: 8px; 
+            flex: 1; 
+            min-width: 0;
+        }
+        
+        .btn-card-action { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            text-decoration: none; 
+            transition: all 0.2s ease; 
+            border: 1px solid transparent; 
+            white-space: nowrap; 
+            min-width: 0;
+            min-height: 36px;
+        }
+        
+        .btn-card-action:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        
+        .btn-visor-green { 
+            background: #dcfce7; 
+            color: #16a34a; 
+            border-color: #bbf7d0; 
+        } 
+        
+        .btn-visor-green:hover { 
+            background: #bbf7d0 !important; 
+            border-color: #86efac !important; 
+        }
+        
+        .btn-editor-blue { 
+            background: #eff6ff; 
+            color: #2563eb; 
+            border-color: #bfdbfe; 
+        } 
+        
+        .btn-editor-blue:hover { 
+            background: #dbeafe !important; 
+            border-color: #93c5fd !important; 
+        }
+        
+        .btn-edit-data { 
+            background: #f8fafc; 
+            color: #64748b; 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        .btn-edit-data:hover { 
+            background: #f1f5f9 !important; 
+            border-color: #cbd5e1 !important; 
+            color: #334155 !important; 
+        }
+        
+        .action-group-icons { 
+            display: flex; 
+            gap: 6px; 
+            flex-shrink: 0;
+        }
+        
+        .btn-icon-small { 
+            width: 32px; 
+            height: 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 8px; 
+            border: 1px solid #e2e8f0; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            font-size: 0.9rem; 
+            background: white;
+            color: #64748b;
+        }
+        
+        .btn-icon-small:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        
+        .btn-public:hover { 
+            background: #f8fafc !important; 
+            border-color: #cbd5e1 !important; 
+            color: #2563eb !important; 
+        }
+        
+        .btn-share-icon:hover { 
+            background: #eff6ff !important; 
+            border-color: #bfdbfe !important; 
+            color: #2563eb !important; 
+        }
+        
+        .btn-del { 
+            background: #fef2f2; 
+            color: #dc2626; 
+            border-color: #fecaca;
+        }
+        
+        .btn-del:hover { 
+            background: #fee2e2 !important; 
+            color: #b91c1c !important; 
+            border-color: #fca5a5 !important;
+        }
+        
+        /* TARJETA NUEVO PROYECTO */
+        .new-project-card { 
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            color: #64748b;
+            cursor: pointer; 
+            border: 2px dashed #cbd5e1; 
+            background: #f8fafc;
+            min-height: 300px;
+            transition: all 0.25s ease;
+        }
+        
+        .new-project-card:hover { 
+            border-color: #3b82f6; 
+            background: #eff6ff; 
+            color: #2563eb; 
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+        }
+        
+        .new-project-card:hover .new-project-icon {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .new-project-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .new-project-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: inherit;
+        }
+
+        /* HEADER DEL DASHBOARD - CORREGIDO */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+        
+        /* BOTÓN NUEVO PROYECTO - CORREGIDO Y MEJORADO */
+        .btn-new-project {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+            height: 44px;
+        }
+        
+        .btn-new-project:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-new-project:active {
+            transform: translateY(0);
+        }
+        
+        .btn-new-project i {
+            font-size: 1rem;
+        }
+
+        /* ESTILOS MODALES */
+        .modal-overlay { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            background: rgba(15, 23, 42, 0.7); 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 1000; 
+            backdrop-filter: blur(6px); 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.3s ease; 
+        }
+        
+        .modal-overlay.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        
+        .modal-card { 
+            width: 100%; 
+            max-width: 480px; 
+            max-height: 85vh; 
+            display: flex; 
+            flex-direction: column; 
+            margin: auto; 
+            background: white; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.25); 
+            animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-header .btn-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .modal-header .btn-close:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        
+        .modal-body { 
+            overflow-y: auto; 
+            padding: 24px; 
+            flex: 1;
+        }
+        
+        /* ICONOS PARA MODALES DE EDICIÓN/CREACIÓN */
+        #modal-title::before {
+            font-family: "bootstrap-icons";
+            font-size: 1.2em;
+        }
+        
+        #modal-title[data-mode="create"]::before {
+            content: "\F4FE";
+            color: #3b82f6;
+        }
+        
+        #modal-title[data-mode="edit"]::before {
+            content: "\F4CB";
+            color: #8b5cf6;
+        }
+        
+        /* ESTILOS MODAL ELIMINAR */
+        #modal-delete .modal-card { 
+            max-width: 420px; 
+        }
+        
+        #modal-delete .modal-body { 
+            text-align: center; 
+            padding: 32px !important; 
+        }
+        
+        #modal-delete .modal-body::before { 
+            content: "\F332"; 
+            font-family: "bootstrap-icons"; 
+            font-size: 3rem; 
+            color: #ef4444; 
+            display: block; 
+            margin-bottom: 16px; 
+        }
+        
+        #modal-delete .modal-body p { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: #0f172a; 
+            margin-bottom: 8px; 
+            line-height: 1.4;
+        }
+        
+        #modal-delete .modal-body p + p { 
+            font-size: 0.9rem; 
+            font-weight: normal; 
+            color: #64748b; 
+            margin-top: 8px; 
+            line-height: 1.5;
+        }
+        
+        #modal-delete .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 24px; 
+            border-top: 1px solid #f1f5f9; 
+            background: #f8fafc; 
+        }
+        
+        #modal-delete .btn-secondary, 
+        #modal-delete .btn-del { 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            border: none; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            min-width: 100px; 
+        }
+        
+        #modal-delete .btn-secondary { 
+            background: white; 
+            color: #475569; 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        #modal-delete .btn-secondary:hover { 
+            background: #f1f5f9; 
+            border-color: #cbd5e1;
+        }
+        
+        #modal-delete .btn-del { 
+            background: #ef4444; 
+            color: white; 
+        }
+        
+        #modal-delete .btn-del:hover { 
+            background: #dc2626; 
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* ESTILOS MODAL COMPARTIR */
+        #modal-share .modal-card { 
+            max-width: 520px; 
+        }
+        
+        #modal-share .modal-body { 
+            padding: 24px !important; 
+        }
+        
+        .share-url-group { 
+            margin-bottom: 24px; 
+        }
+        
+        .share-url-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #334155; 
+            font-size: 0.9rem; 
+        }
+        
+        .copy-input-wrapper { 
+            display: flex; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            background: #f8fafc; 
+            transition: border-color 0.2s; 
+        }
+        
+        .copy-input-wrapper:hover { 
+            border-color: #cbd5e1; 
+        }
+        
+        .copy-input-wrapper .copy-input { 
+            flex: 1; 
+            border: none; 
+            padding: 12px 16px; 
+            background: white; 
+            color: #0f172a; 
+            font-size: 0.85rem; 
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+        }
+        
+        .copy-input-wrapper .copy-input:focus { 
+            outline: none; 
+        }
+        
+        .copy-input-wrapper .btn-copy { 
+            background: #3b82f6; 
+            color: white; 
+            border: none; 
+            padding: 0 16px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            transition: background 0.2s; 
+            white-space: nowrap; 
+        }
+        
+        .copy-input-wrapper .btn-copy:hover { 
+            background: #2563eb; 
+        }
+        
+        .copy-feedback { 
+            display: block; 
+            margin-top: 6px; 
+            font-size: 0.8rem; 
+            color: #10b981; 
+            min-height: 18px; 
+        }
+        
+        /* SUBIDA DE ARCHIVOS */
+        .file-upload-container { 
+            border: 2px dashed #cbd5e1; 
+            border-radius: 10px; 
+            background: #f8fafc; 
+            min-height: 140px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            padding: 20px;
+        }
+        
+        .file-upload-container:hover {
+            border-color: #94a3b8;
+            background: #f1f5f9;
+        }
+        
+        .file-upload-input { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            top: 0; 
+            left: 0; 
+            opacity: 0; 
+            cursor: pointer; 
+        }
+        
+        .current-image-preview { 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            top:0; 
+            left:0; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            opacity: 0.3; 
+            pointer-events: none; 
+        }
+        
+        /* MENSAJE DE ERROR DE TAMAÑO DE ARCHIVO */
+        .file-size-error {
+            display: none;
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #fef2f2;
+            border-radius: 6px;
+            border-left: 3px solid #ef4444;
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        .file-size-error.show {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .file-size-error i {
+            font-size: 1rem;
+        }
+        
+        /* ANIMACIONES */
+        @keyframes modalAppear {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.98); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* ESTILOS DE FORMULARIO */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+        
+        .styled-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #0f172a;
+            background: white;
+            transition: all 0.2s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .styled-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .styled-input::placeholder {
+            color: #94a3b8;
+        }
+        
+        textarea.styled-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* MODAL FOOTER */
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f8fafc;
+        }
+        
+        .btn-secondary {
+            padding: 10px 20px;
+            background: white;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        /* BOTÓN DESHABILITADO POR ARCHIVO GRANDE */
+        .btn-disabled-large-file {
+            background: #94a3b8 !important;
+            color: white !important;
+            cursor: not-allowed !important;
+            opacity: 0.7;
+        }
+        
+        .btn-disabled-large-file:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .btn-new-project {
+                align-self: flex-start;
+            }
+            
+            .projects-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            }
+            
+            .card-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .action-group-icons {
+                margin-left: 0 !important;
+                justify-content: center;
+            }
+            
+            .modal-card {
+                max-width: 95% !important;
+            }
+            
+            .modal-body {
+                padding: 20px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .projects-grid { 
+                grid-template-columns: 1fr; 
+            }
+            
+            .action-group-main {
+                flex-direction: column;
+            }
+            
+            .btn-card-action {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo-text" style="text-decoration:none;">
+                    <i class="bi bi-bounding-box-circles"></i> LOTI<span>FY</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="sidebar-link active"><i class="bi bi-grid-fill"></i> Mis Proyectos</a></li>
+                <li class="admin-only-menu"><a href="gestion-lotes.html" class="sidebar-link"><i class="bi bi-list-check"></i> Gestión Lotes</a></li>
+                <li><a href="clientes.html" class="sidebar-link"><i class="bi bi-people"></i> Clientes</a></li>
+                <li><a href="ventas.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i> Ventas & Visitas</a></li>
+                <li class="admin-only-menu"><a href="configuracion.html" class="sidebar-link"><i class="bi bi-gear"></i> Configuración</a></li>
+                <li class="admin-only-menu"><a href="equipo.html" class="sidebar-link"><i class="bi bi-shield-lock"></i> Equipo</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar-circle"><i class="bi bi-person-fill"></i></div>
+                    <div class="user-info">
+                        <span class="user-name" id="user-name-display">Cargando...</span>
+                        <span class="user-role" id="user-role-display">...</span>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logout-btn"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="dashboard-header">
+                <h1 class="page-title">Mis Proyectos</h1>
+                <button class="btn-new-project admin-only" onclick="openModal(null, 'create')">
+                    <i class="bi bi-plus-lg"></i> Nuevo Proyecto
+                </button>
+            </div>
+            <div id="projects-grid" class="projects-grid">
+                <div class="alert alert-success" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">
+                    Cargando proyectos...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-share" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="bi bi-link-45deg"></i> Compartir Proyecto</h3>
+                <button class="btn-close" onclick="closeModal('share')"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="color:#64748b; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.5;">
+                    Copia el enlace directo para enviar por WhatsApp o el código Iframe para incrustar en tu web.
+                </p>
+                
+                <div class="share-url-group">
+                    <label>Link Directo (Vendedor / Cliente)</label>
+                    <div class="copy-input-wrapper">
+                        <input type="text" id="share-link-input" class="copy-input" readonly>
+                        <button class="btn-copy" onclick="copyToClipboard('share-link-input', 'link-feedback')">Copiar</button>
+                    </div>
+                    <span id="link-feedback" class="copy-feedback"></span>
+                </div>
+
+                <div class="share-url-group admin-only-share">
+                    <label>Código Iframe (Web)</label>
+                    <div class="copy-input-wrapper">
+                        <textarea id="share-iframe-input" class="copy-input" style="height: 70px; resize: none; font-family: 'SF Mono', Monaco, 'Courier New', monospace;"></textarea>
+                        <button class="btn-copy" onclick="copyToClipboard('share-iframe-input', 'iframe-feedback')">Copiar</button>
+                    </div>
+                    <span id="iframe-feedback" class="copy-feedback"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal-project" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Proyecto</h3>
+                <button class="btn-close" onclick="closeModal('project')"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="project-form" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+                <input type="hidden" id="edit-project-id" name="project_id">
+                <div class="modal-body">
+                    <div id="modal-alert" class="alert alert-danger hidden"></div>
+                    
+                    <div class="input-group">
+                        <label>Nombre del Proyecto</label>
+                        <input type="text" class="styled-input" id="input-nombre" name="nombre" required placeholder="Ej. Loteo Los Álamos">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Ubicación / Localidad</label>
+                        <input type="text" class="styled-input" id="input-localidad" name="localidad" placeholder="Ej. Puerto Varas">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Descripción</label>
+                        <textarea class="styled-input" id="input-descripcion" name="descripcion" placeholder="Breve descripción..."></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Foto 360° <span style="color:#64748b; font-size:0.85rem; font-weight:normal;">(Máximo 10 MB)</span></label>
+                        <div class="file-upload-container" id="drop-zone">
+                            <img id="current-image-bg" class="current-image-preview" style="display:none;">
+                            <input type="file" class="file-upload-input" name="imagen360" id="file-input" accept=".jpg,.jpeg,.png,.webp" onchange="handleFileSelect(this)">
+                            <div class="file-upload-content" id="default-upload-content">
+                                <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #94a3b8; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600; color: #64748b; text-align: center;">
+                                    <div>Haz clic o arrastra para subir</div>
+                                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px;">Formatos: JPG, PNG, WEBP</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Mensaje de error para archivos grandes -->
+                        <div id="file-size-error" class="file-size-error">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span id="file-size-error-text">El archivo es demasiado grande. El tamaño máximo es 10 MB.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('project')">Cancelar</button>
+                    <button type="submit" class="btn-new-project" style="margin: 0;" id="save-btn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="modal-delete" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="bi bi-trash"></i> Eliminar Proyecto</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de eliminar este proyecto?</p>
+                <p>Esta acción no se puede deshacer.</p>
+                <input type="hidden" id="project-id-to-delete">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('delete')">Cancelar</button>
+                <button class="btn-del" onclick="deleteProjectHandler()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const grid = document.getElementById('projects-grid');
+        const logoutBtn = document.getElementById('logout-btn');
+        const form = document.getElementById('project-form'); 
+        let currentProjectsData = []; 
+        let currentUserRole = 'vendedor';
+        let hasLargeFile = false; // Variable para controlar si hay archivo grande
+
+        const token = localStorage.getItem('userToken');
+        if(!token) window.location.href = 'index.html';
+        
+        // 1. CARGA DE PERFIL
+        fetch('http://localhost:3000/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(user => {
+                document.getElementById('user-name-display').innerText = user.nombre_usuario || 'Usuario';
+                currentUserRole = user.rol || 'vendedor'; 
+                document.getElementById('user-role-display').innerText = currentUserRole === 'admin' ? 'Administrador' : 'Vendedor';
+                
+                if (currentUserRole === 'admin') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-only'));
+                    document.querySelectorAll('.admin-only-menu').forEach(el => el.classList.remove('admin-only-menu'));
+                }
+                loadProjects();
+            })
+            .catch(err => console.error("Error perfil", err));
+
+        logoutBtn.addEventListener('click', () => { 
+            localStorage.removeItem('userToken'); 
+            window.location.href = 'index.html'; 
+        });
+        
+        function openModal(projectId=null, mode='create') {
+            const modal = document.getElementById('modal-project');
+            const title = document.getElementById('modal-title');
+            const saveBtn = document.getElementById('save-btn');
+            const editIdInput = document.getElementById('edit-project-id');
+            const fileSizeError = document.getElementById('file-size-error');
+            
+            // Resetear estado del formulario
+            form.reset();
+            document.getElementById('current-image-bg').style.display = 'none';
+            hasLargeFile = false;
+            
+            // Ocultar mensaje de error de archivo grande
+            fileSizeError.classList.remove('show');
+            
+            // Restaurar contenido de subida
+            document.getElementById('default-upload-content').innerHTML = `
+                <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #94a3b8; margin-bottom: 8px;"></i>
+                <div style="font-weight: 600; color: #64748b; text-align: center;">
+                    <div>Haz clic o arrastra para subir</div>
+                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px;">Formatos: JPG, PNG, WEBP (Max. 10MB)</div>
+                </div>
+            `;
+            
+            // Restaurar botón de guardar
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('btn-disabled-large-file');
+            
+            // Agregar data-mode para mostrar iconos diferentes
+            title.setAttribute('data-mode', mode);
+            
+            if(mode === 'edit' && projectId) {
+                const project = currentProjectsData.find(p => p.id === projectId);
+                title.innerText = 'Editar Proyecto';
+                saveBtn.innerHTML = '<i class="bi bi-check-lg"></i> Guardar Cambios';
+                editIdInput.value = projectId;
+                document.getElementById('input-nombre').value = project.nombre;
+                document.getElementById('input-localidad').value = project.localidad || '';
+                document.getElementById('input-descripcion').value = project.descripcion || '';
+                if(project.imagen_360_url) {
+                    document.getElementById('current-image-bg').src = project.imagen_360_url;
+                    document.getElementById('current-image-bg').style.display = 'block';
+                }
+            } else {
+                title.innerText = 'Nuevo Proyecto';
+                saveBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Crear Proyecto';
+                editIdInput.value = '';
+            }
+            modal.classList.add('show');
+        }
+
+        function closeModal(t) {
+            document.getElementById(`modal-${t}`).classList.remove('show');
+        }
+
+        function handleFileSelect(input) {
+            const fileSizeError = document.getElementById('file-size-error');
+            const fileSizeErrorText = document.getElementById('file-size-error-text');
+            const saveBtn = document.getElementById('save-btn');
+            
+            // Ocultar mensaje de error por defecto
+            fileSizeError.classList.remove('show');
+            hasLargeFile = false;
+            
+            if(input.files && input.files[0]) {
+                const file = input.files[0];
+                const maxSize = 10 * 1024 * 1024; // 10 MB en bytes
+                
+                // Verificar tamaño del archivo
+                if (file.size > maxSize) {
+                    // Mostrar mensaje de error
+                    fileSizeErrorText.textContent = `El archivo es demasiado grande (${formatFileSize(file.size)}). El tamaño máximo es 10 MB.`;
+                    fileSizeError.classList.add('show');
+                    
+                    // Deshabilitar botón de guardar
+                    saveBtn.disabled = true;
+                    saveBtn.classList.add('btn-disabled-large-file');
+                    saveBtn.innerHTML = '<i class="bi bi-exclamation-circle"></i> Archivo muy grande';
+                    hasLargeFile = true;
+                    
+                    // Limpiar el input de archivo
+                    input.value = '';
+                    
+                    // Restaurar contenido de subida
+                    document.getElementById('default-upload-content').innerHTML = `
+                        <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: #ef4444; margin-bottom: 8px;"></i>
+                        <div style="font-weight: 600; color: #ef4444; text-align: center;">
+                            <div>Archivo demasiado grande</div>
+                            <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px; color: #64748b;">Selecciona otro archivo menor a 10 MB</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Si el archivo es válido, habilitar el botón de guardar
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('btn-disabled-large-file');
+                
+                const mode = document.getElementById('modal-title').getAttribute('data-mode');
+                saveBtn.innerHTML = mode === 'edit' ? 
+                    '<i class="bi bi-check-lg"></i> Guardar Cambios' : 
+                    '<i class="bi bi-plus-lg"></i> Crear Proyecto';
+                
+                const fileName = file.name;
+                const fileSizeFormatted = formatFileSize(file.size);
+                
+                document.getElementById('current-image-bg').style.display = 'none';
+                document.getElementById('default-upload-content').innerHTML = `
+                    <i class="bi bi-file-earmark-image" style="font-size: 2rem; color: #3b82f6; margin-bottom: 8px;"></i>
+                    <div style="font-weight: 600; color: #3b82f6; text-align: center;">
+                        <div>${fileName}</div>
+                        <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px; color: #64748b;">
+                            ${fileSizeFormatted} • Archivo válido
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Función para formatear el tamaño del archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // --- FUNCIÓN COPIAR AL PORTAPAPELES ---
+        function copyToClipboard(elementId, feedbackId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            document.getElementById(feedbackId).innerText = '✅ ¡Copiado al portapapeles!';
+            setTimeout(() => { 
+                document.getElementById(feedbackId).innerText = ''; 
+            }, 2000);
+        }
+
+        // --- FUNCIÓN ABRIR MODAL COMPARTIR ---
+        function openShareModal(slug) {
+            const publicLink = `${window.location.origin}/frontend/public.html?s=${slug}`;
+            const iframeCode = `<iframe src="${publicLink}" width="100%" height="600px" frameborder="0" style="border: none;"></iframe>`;
+            
+            document.getElementById('share-link-input').value = publicLink;
+            document.getElementById('share-iframe-input').value = iframeCode;
+
+            if (currentUserRole !== 'admin') {
+                document.querySelectorAll('.admin-only-share').forEach(el => el.style.display = 'none');
+            } else {
+                document.querySelectorAll('.admin-only-share').forEach(el => el.style.display = 'block');
+            }
+
+            document.getElementById('link-feedback').innerText = '';
+            document.getElementById('iframe-feedback').innerText = '';
+            document.getElementById('modal-share').classList.add('show');
+        }
+
+        async function loadProjects() {
+            try {
+                currentProjectsData = await getProjects(); 
+                grid.innerHTML = '';
+                
+                if (currentUserRole === 'admin') {
+                    const addCard = document.createElement('div'); 
+                    addCard.className = 'new-project-card project-card';
+                    addCard.onclick = () => openModal(null, 'create');
+                    addCard.innerHTML = `
+                        <div class="new-project-icon"><i class="bi bi-plus-lg"></i></div>
+                        <div class="new-project-text">Crear Nuevo Proyecto</div>
+                    `;
+                    grid.appendChild(addCard);
+                }
+
+                if (currentProjectsData.length === 0 && currentUserRole !== 'admin') {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align:center; padding: 60px 20px; color: #64748b;">
+                            <i class="bi bi-inbox" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 16px;"></i>
+                            <h3 style="font-weight: 600; color: #475569; margin-bottom: 8px;">No hay proyectos asignados</h3>
+                            <p style="max-width: 400px; margin: 0 auto;">Contacta al administrador para que te asigne proyectos.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                currentProjectsData.forEach(p => {
+                    const card = document.createElement('div'); 
+                    card.className = 'project-card';
+                    const fecha = new Date(p.creado_en).toLocaleDateString('es-CL', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                    const publicLink = `${window.location.origin}/frontend/public.html?s=${p.slug_publico}`;
+                    
+                    let imageHTML = '';
+                    if (p.imagen_360_url) {
+                        imageHTML = `<img src="${p.imagen_360_url}" alt="${p.nombre}">`;
+                    } else {
+                        imageHTML = `
+                            <div style="display: flex; flex-direction: column; align-items: center; color: #94a3b8;">
+                                <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                <div style="font-size: 0.8rem; margin-top: 8px;">Sin imagen</div>
+                            </div>
+                        `;
+                    }
+
+                    // BOTONES DINÁMICOS SEGÚN ROL
+                    let mainButton = '';
+                    let actionButtonsHTML = '';
+                    let targetClickURL = '';
+
+                    if (currentUserRole === 'admin') {
+                        // ADMIN: Editor (visor.html) + Datos + Ver Público + Borrar
+                        mainButton = `
+                            <a href="visor.html?projectId=${p.id}" class="btn-card-action btn-editor-blue">
+                                <i class="bi bi-pencil-fill"></i> Editor 360°
+                            </a>`;
+                        actionButtonsHTML = `
+                            <button class="btn-card-action btn-edit-data" onclick="openModal(${p.id}, 'edit')">
+                                <i class="bi bi-list-ul"></i> Datos
+                            </button>`;
+                        targetClickURL = `visor.html?projectId=${p.id}`;
+                    } else {
+                        // VENDEDOR: Ver Público (public.html)
+                        mainButton = `
+                            <a href="${publicLink}" target="_blank" class="btn-card-action btn-visor-green">
+                                <i class="bi bi-eye-fill"></i> Ver Público
+                            </a>`;
+                        targetClickURL = publicLink;
+                    }
+
+                    card.innerHTML = `
+                        <div class="card-img-top" onclick="window.open('${targetClickURL}', '_self')" style="cursor:pointer;">
+                            ${imageHTML}
+                        </div>
+                        <div class="card-body">
+                            <div class="project-date">${fecha}</div>
+                            <h3 class="project-title" title="${p.nombre}">${p.nombre}</h3>
+                            <p class="project-desc">${p.descripcion || 'Sin descripción'}</p>
+                            
+                            <div class="card-actions">
+                                <div class="action-group-main">
+                                    ${mainButton}
+                                    ${actionButtonsHTML} 
+                                </div>
+                                <div class="action-group-icons">
+                                    ${currentUserRole === 'admin' ? 
+                                        `<a href="${publicLink}" target="_blank" class="btn-icon-small btn-public" title="Ver Público Cliente">
+                                            <i class="bi bi-eye"></i>
+                                        </a>` : ''}
+
+                                    <button class="btn-icon-small btn-share-icon" onclick="openShareModal('${p.slug_publico}')" title="Compartir Link">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </button>
+                                    
+                                    ${currentUserRole === 'admin' ? 
+                                        `<button class="btn-icon-small btn-del" onclick="confirmDeleteProject(${p.id})" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>` : ''}
+                                </div>
+                            </div>
+                        </div>`;
+                    grid.appendChild(card);
+                });
+            } catch (error) { 
+                grid.innerHTML = `
+                    <div class="alert alert-danger" style="grid-column: 1/-1; text-align: center; padding: 20px;">
+                        <i class="bi bi-exclamation-triangle"></i> Error al cargar proyectos: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            // Validar si hay un archivo grande antes de enviar
+            if (hasLargeFile) {
+                alert('Por favor, selecciona un archivo menor a 10 MB antes de guardar.');
+                return;
+            }
+            
+            const btn = document.getElementById('save-btn'); 
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+            
+            try { 
+                const fd = new FormData(form); 
+                const id = document.getElementById('edit-project-id').value;
+                
+                // Verificar tamaño del archivo nuevamente antes de enviar
+                const fileInput = document.getElementById('file-input');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const maxSize = 10 * 1024 * 1024; // 10 MB
+                    
+                    if (file.size > maxSize) {
+                        throw new Error('El archivo es demasiado grande. Máximo 10 MB.');
+                    }
+                }
+                
+                if(id) {
+                    await updateProject(id, fd); 
+                } else {
+                    await createProject(fd);
+                }
+                closeModal('project'); 
+                loadProjects();
+            } catch(error) { 
+                alert('Error: ' + error.message); 
+            } finally { 
+                btn.disabled = false; 
+                const mode = document.getElementById('modal-title').getAttribute('data-mode');
+                btn.innerHTML = mode === 'edit' ? 
+                    '<i class="bi bi-check-lg"></i> Guardar Cambios' : 
+                    '<i class="bi bi-plus-lg"></i> Crear Proyecto';
+            }
+        });
+        
+        function confirmDeleteProject(id) { 
+            document.getElementById('project-id-to-delete').value = id; 
+            document.getElementById('modal-delete').classList.add('show'); 
+        }
+        
+        async function deleteProjectHandler() { 
+            const id = document.getElementById('project-id-to-delete').value; 
+            try {
+                await deleteProject(id); 
+                closeModal('delete'); 
+                loadProjects();
+            } catch (error) {
+                alert('Error al eliminar: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

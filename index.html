@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOTIFY | Gestión Inteligente de Loteos 360°</title>
+    
+    <link rel="icon" type="image/png" href="fav.png.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* --- ESTILOS PROFESIONALES (Rediseño Verde) --- */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* 1. NAVBAR BLANCO PRO */
+        .navbar-landing {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 0 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Sombra suave */
+            height: 80px;
+        }
+
+        .brand-logo {
+            text-decoration: none; display: flex; align-items: center; gap: 12px;
+            font-size: 1.5rem; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;
+        }
+        .brand-logo img { height: 38px; width: auto; display: block; }
+        .brand-logo span { color: #2563eb; }
+
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-item { text-decoration: none; color: #64748b; font-weight: 600; font-size: 0.95rem; transition: 0.2s; cursor: pointer; }
+        .nav-item:hover { color: #2563eb; }
+
+        /* 2. HERO SECTION VIBRANTE */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            display: flex; align-items: center;
+            padding: 80px 5% 0 5%;
+            /* FOTO NUEVA: Campo verde intenso vista dron */
+            background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2940&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Efecto Parallax */
+        }
+
+        /* Overlay oscuro para resaltar el verde y el texto blanco */
+        .hero-section::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            /* Degradado de negro a transparente para que el texto se lea perfecto */
+            background: linear-gradient(to right, rgba(0, 20, 10, 0.85) 0%, rgba(0, 40, 20, 0.4) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 650px;
+            position: relative;
+            z-index: 2;
+            color: white; /* Texto blanco sobre fondo oscuro */
+            animation: fadeUp 1s ease-out;
+        }
+
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.15); /* Glassmorphism */
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #4ade80; /* Verde brillante neon */
+            padding: 8px 16px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.85rem; font-weight: 700; margin-bottom: 25px;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem; line-height: 1.1; font-weight: 800; margin-bottom: 25px;
+            color: #ffffff; letter-spacing: -1.5px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .hero-content p {
+            font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px;
+            color: #e2e8f0; font-weight: 400; /* Gris muy claro */
+        }
+
+        /* Botones Mejorados */
+        .btn-xl {
+            padding: 16px 36px; font-size: 1.05rem; border-radius: 12px;
+            font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            transition: all 0.3s ease; cursor: pointer; border: none;
+        }
+        
+        .btn-primary-hero {
+            background: #2563eb; color: white;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+        }
+        .btn-primary-hero:hover { 
+            transform: translateY(-3px); 
+            background: #1d4ed8; 
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.6); 
+        }
+        
+        .btn-glass-hero {
+            background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.5); 
+            color: white; margin-left: 15px;
+            backdrop-filter: blur(4px);
+        }
+        .btn-glass-hero:hover { 
+            background: rgba(255,255,255,0.2); 
+            border-color: white; 
+        }
+
+        /* Animaciones */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-delay-1 { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; animation-name: fadeUp; animation-duration: 0.8s; }
+        .animate-delay-2 { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; animation-name: fadeUp; animation-duration: 0.8s; }
+
+        /* SECCIONES */
+        .section-padding { padding: 100px 5%; }
+        .section-header { text-align: center; max-width: 700px; margin: 0 auto 60px auto; }
+        .section-header h2 { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin-bottom: 15px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        
+        .feature-card {
+            background: white; padding: 40px; border-radius: 24px;
+            border: 1px solid #f1f5f9; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        /* Hover verde para seguir la temática */
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px -10px rgba(16, 185, 129, 0.15); border-color: #10b981; }
+        
+        .icon-box {
+            width: 55px; height: 55px; background: #ecfdf5; color: #10b981; /* Verde */
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin-bottom: 25px;
+        }
+
+        /* MODAL Y FORMULARIOS */
+        .auth-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .auth-modal.active { display: flex; opacity: 1; }
+        
+        .auth-box {
+            background: white; width: 100%; max-width: 440px; padding: 3rem 2.5rem;
+            border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative; transform: translateY(20px); transition: transform 0.3s;
+        }
+        .auth-modal.active .auth-box { transform: translateY(0); }
+        
+        .close-modal {
+            position: absolute; top: 20px; right: 20px; font-size: 1.5rem; 
+            cursor: pointer; color: #94a3b8; transition: 0.2s;
+        }
+        .close-modal:hover { color: #ef4444; }
+
+        /* INPUTS MEJORADOS */
+        .input-group { margin-bottom: 1.5rem; text-align: left; }
+        .input-group label { 
+            display: block; margin-bottom: 0.6rem; font-weight: 600; 
+            font-size: 0.9rem; color: #334155; 
+        }
+        
+        .input-wrapper {
+            position: relative; width: 100%;
+        }
+        
+        /* Icono Izquierdo (Fijo) */
+        .input-wrapper .input-icon {
+            position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; font-size: 1.2rem; z-index: 10; pointer-events: none;
+        }
+
+        /* Icono Derecho (Ojo Password - Clickable) */
+        .toggle-password-icon {
+            position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; font-size: 1.2rem; z-index: 10; cursor: pointer;
+            transition: color 0.2s;
+        }
+        .toggle-password-icon:hover { color: #2563eb; }
+
+        /* Campo de Texto Estilizado */
+        .styled-input {
+            width: 100%;
+            padding: 14px 45px 14px 50px !important; /* Espacio para iconos izq/der */
+            border: 1px solid #e2e8f0; border-radius: 12px;
+            font-size: 1rem; color: #1e293b; font-family: inherit;
+            background: #f8fafc; transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .styled-input:focus {
+            outline: none; border-color: #2563eb; background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        .styled-input::placeholder { color: #cbd5e1; }
+
+        /* Footer */
+        .footer { background: #0f172a; color: white; padding: 80px 5% 40px 5%; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
+        .footer-brand img { height: 30px; opacity: 0.9; }
+        .footer ul { list-style: none; padding: 0; }
+        .footer li { margin-bottom: 12px; }
+        .footer a { color: #94a3b8; text-decoration: none; transition: 0.2s; }
+        .footer a:hover { color: white; }
+
+        @media(max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-content h1 { font-size: 3rem; }
+            .hero-section { padding-top: 100px; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .demo-section { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar-landing">
+        <a href="#" class="brand-logo">
+            <img src="Logo.png" alt="Lotify Logo"> 
+            
+        </a>
+        <div class="nav-links">
+            <a class="nav-item" onclick="scrollToSection('features')">Características</a>
+            <a class="nav-item" onclick="scrollToSection('demo')">Cómo Funciona</a>
+            <a class="nav-item" onclick="openAuth('login')">Ingresar</a>
+            <button class="btn-xl btn-primary-hero" style="padding: 10px 24px; font-size: 0.9rem;" onclick="openAuth('register')">Comenzar Gratis</button>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge animate-delay-1">
+                <i class="bi bi-stars" style="color:#4ade80;"></i> Nueva Versión 2.0
+            </div>
+            <h1 class="animate-delay-1">Digitaliza y Vende tus Loteos en 360°</h1>
+            <p class="animate-delay-2">La plataforma integral para inmobiliarias. Dibuja lotes interactivos sobre vistas reales, gestiona tu inventario y vende más rápido.</p>
+            
+            <div class="animate-delay-2" style="display:flex; flex-wrap:wrap; gap:15px;">
+                <button class="btn-xl btn-primary-hero" onclick="openAuth('register')">
+                    Crear mi primer proyecto
+                </button>
+                <button class="btn-xl btn-glass-hero" onclick="scrollToSection('features')">
+                    <i class="bi bi-play-circle"></i> Ver Demo
+                </button>
+            </div>
+            
+            <div class="animate-delay-2" style="margin-top: 40px; display:flex; align-items:center; gap:15px;">
+                <div style="display:flex;">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" style="width:35px; height:35px; border-radius:50%; border:2px solid white;">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" style="width:35px; height:35px; border-radius:50%; border:2px solid white; margin-left:-12px;">
+                    <img src="https://randomuser.me/api/portraits/men/85.jpg" style="width:35px; height:35px; border-radius:50%; border:2px solid white; margin-left:-12px;">
+                </div>
+                <div style="font-size:0.9rem; color:#e2e8f0;">
+                    Usado por <strong>+100 inmobiliarias</strong> en Chile.
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="section-padding" style="background:#f8fafc;">
+        <div class="section-header">
+            <h2>Tecnología que vende por ti</h2>
+            <p style="color:#64748b; font-size:1.1rem;">Deja atrás los planos en papel. Ofrece una experiencia inmersiva.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon-box"><i class="bi bi-bounding-box"></i></div>
+                <h3>Editor de Polígonos</h3>
+                <p style="color:#64748b;">Dibuja lotes, áreas comunes y caminos directamente sobre la foto 360° con precisión milimétrica.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon-box"><i class="bi bi-stoplights"></i></div>
+                <h3>Estados en Vivo</h3>
+                <p style="color:#64748b;">Cambia el estado de un lote a "Vendido" o "Reservado" en segundos y actualiza todos los visores.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon-box"><i class="bi bi-share"></i></div>
+                <h3>Links Públicos</h3>
+                <p style="color:#64748b;">Genera un enlace único para cada proyecto. Ideal para enviar por WhatsApp o integrar en tu web.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo" class="section-padding" style="background:white; text-align:center;">
+        <div style="max-width:800px; margin:0 auto;">
+            <h2 style="font-size:2.5rem; margin-bottom:20px; font-weight:800;">¿Listo para modernizar tu venta?</h2>
+            <p style="font-size:1.2rem; color:#64748b; margin-bottom:40px;">Únete a Lotify hoy mismo. Sin tarjetas de crédito para empezar.</p>
+            <button class="btn-xl btn-primary-hero" onclick="openAuth('register')">Registrarme Gratis</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <a href="#" class="brand-logo footer-brand" style="color:white;">
+                    <img src="Logo.png" alt="Lotify" style="filter: brightness(0) invert(1);"> 
+                    
+                </a>
+                <p style="color:#94a3b8; font-size:0.9rem;">Plataforma de gestión visual para proyectos inmobiliarios.</p>
+            </div>
+            <div>
+                <h4 style="color:white; margin-bottom:15px;">Producto</h4>
+                <ul>
+                    <li><a href="#">Características</a></li>
+                    <li><a href="#">Precios</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color:white; margin-bottom:15px;">Contacto</h4>
+                <ul>
+                    <li><a href="#">Soporte</a></li>
+                    <li><a href="#">Ventas</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); text-align:center; color:#64748b; font-size:0.85rem;">
+            &copy; 2025 Lotify Inc. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-box">
+            <button class="btn-close close-modal" onclick="closeAuth()"><i class="bi bi-x-lg"></i></button>
+            
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 60px; height: 60px; background: #eff6ff; color: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 1.8rem;">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <h2 id="modal-title" style="margin: 0; font-size: 1.6rem; color: #0f172a; font-weight:700;">Bienvenido</h2>
+                <p id="modal-subtitle" style="color: #64748b; margin-top: 8px;">Ingresa tus datos para continuar</p>
+            </div>
+
+            <div id="auth-alert" class="alert alert-danger hidden" style="margin-bottom: 1rem; padding: 12px; border-radius: 8px; font-size: 0.9rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;"></div>
+
+            <form id="auth-form">
+                <div id="register-fields" class="hidden">
+                    <div class="input-group">
+                        <label>Nombre Completo</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" class="styled-input" id="nombre" placeholder="Ej. Matías Mora">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input type="email" class="styled-input" id="email" placeholder="admin@lotify.cl" required>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 2rem;">
+                    <label>Contraseña</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" class="styled-input" id="password" placeholder="••••••••" required>
+                        <i class="bi bi-eye-slash toggle-password-icon" id="togglePassword"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary-block" id="submit-btn" style="font-size: 1rem; padding: 14px; width:100%; background:#2563eb; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                    Ingresar
+                </button>
+                
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748b;">
+                    <span id="toggle-text">¿No tienes cuenta?</span> 
+                    <a href="#" style="color: #2563eb; font-weight: 600; text-decoration: none; margin-left: 5px;" id="toggle-link">Regístrate gratis</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // --- LOGICA UI & AUTH ---
+        
+        // Scroll Navbar
+        const navbar = document.querySelector('.navbar-landing');
+        // No necesitamos efecto scroll en el navbar blanco fijo, 
+        // pero podemos agregar una sombra extra si se scrollea
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)";
+            else navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05)";
+        });
+
+        function scrollToSection(id) {
+            const section = document.getElementById(id);
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Lógica Modal
+        const modal = document.getElementById('auth-modal');
+        const form = document.getElementById('auth-form');
+        const alertBox = document.getElementById('auth-alert');
+        let isLoginMode = true;
+
+        // Lógica del OJO (Ver Contraseña)
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            // Alternar tipo de input
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Alternar icono
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+
+        function openAuth(mode) {
+            isLoginMode = mode === 'login';
+            updateModalUI();
+            modal.classList.add('active');
+        }
+
+        function closeAuth() {
+            modal.classList.remove('active');
+            alertBox.classList.add('hidden');
+            form.reset();
+            // Resetear ojo
+            passwordInput.setAttribute('type', 'password');
+            togglePassword.classList.remove('bi-eye');
+            togglePassword.classList.add('bi-eye-slash');
+        }
+
+        document.getElementById('toggle-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            updateModalUI();
+        });
+
+        function updateModalUI() {
+            const title = document.getElementById('modal-title');
+            const sub = document.getElementById('modal-subtitle');
+            const btn = document.getElementById('submit-btn');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleLink = document.getElementById('toggle-link');
+            const regFields = document.getElementById('register-fields');
+
+            alertBox.classList.add('hidden');
+
+            if (isLoginMode) {
+                title.innerText = 'Iniciar Sesión';
+                sub.innerText = 'Accede a tus proyectos';
+                btn.innerText = 'Ingresar';
+                toggleText.innerText = '¿No tienes cuenta?';
+                toggleLink.innerText = 'Regístrate gratis';
+                regFields.classList.add('hidden');
+            } else {
+                title.innerText = 'Crear Cuenta';
+                sub.innerText = 'Comienza tu prueba gratuita';
+                btn.innerText = 'Crear Cuenta';
+                toggleText.innerText = '¿Ya tienes cuenta?';
+                toggleLink.innerText = 'Inicia Sesión';
+                regFields.classList.remove('hidden');
+            }
+        }
+
+        // Envío Formulario
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerText;
+            alertBox.classList.add('hidden'); 
+
+            btn.disabled = true; 
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Iniciando sesión...';
+
+            const email = document.getElementById('email').value.toLowerCase();
+            const password = document.getElementById('password').value;
+            const nombre = document.getElementById('nombre').value;
+
+            try {
+                let data;
+                if (isLoginMode) {
+                    data = await loginUser(email, password);
+                } else {
+                    data = await registerUser(nombre, email, password);
+                }
+                
+                // CRÍTICO: Comprobamos que el token exista antes de intentar usarlo
+                if (!data || !data.token) {
+                     throw new Error('Respuesta exitosa, pero el token de sesión está vacío. Intenta de nuevo.');
+                }
+                
+                // Si el login/registro fue exitoso, el API devuelve el token
+                localStorage.setItem('userToken', data.token);
+                
+                // CRÍTICO: Forzar el cierre del modal y mostrar éxito visual antes de redirigir
+                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> ¡Éxito!';
+                btn.style.backgroundColor = '#10b981';
+                closeAuth(); 
+                
+                // CRÍTICO: Pausa la redirección (100ms) para asegurar la persistencia en LocalStorage
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 100); 
+
+            } catch (error) {
+                // Si es un error de token/sesión que lleva a la redirección, api.js ya lo manejó
+                if (!error.message.includes('Sesión expirada')) {
+                    alertBox.innerText = error.message;
+                    alertBox.classList.remove('hidden');
+                }
+                    
+                // Restablece el botón (asegura que no se quede colgado)
+                btn.disabled = false;
+                btn.innerText = originalText;
+                btn.style.backgroundColor = ''; // Restaura el color
+            }
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeAuth();
+        });
+    </script>
+</body>
+</html>

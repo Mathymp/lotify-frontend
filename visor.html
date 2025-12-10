@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor 360 - LOTIFY</title>
+    <link rel="icon" type="image/png" href="fav.png.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.7.3/index.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.7.3/index.min.css">
+    
+    <link rel="stylesheet" href="css/visor.css">
+</head>
+<body>
+
+    <div id="viewer"></div>
+
+    <div class="top-capsule">
+        <a href="dashboard.html" class="back-circle"><i class="bi bi-arrow-left"></i></a>
+        <span class="project-title" id="project-title">Cargando...</span>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar-title">HERRAMIENTAS</div>
+        <button class="tool-btn" id="btn-lote" onclick="setMode('lote')"><i class="bi bi-bounding-box"></i> <span>Dibujar Lote</span></button>
+        <div class="settings-panel" id="lote-settings">
+            <div class="control-row"><span class="control-label">Grosor</span><input type="range" id="lote-width" min="1" max="10" value="4" oninput="updateSettings('lote')"><span class="val-display" id="disp-lote-width">4</span></div>
+        </div>
+        
+        <button class="tool-btn" id="btn-camino" onclick="setMode('camino')"><i class="bi bi-bezier2"></i> <span>Dibujar Camino</span></button>
+        <div class="settings-panel" id="camino-settings">
+            <div class="control-row"><span class="control-label">Ancho</span><input type="range" id="camino-width" min="2" max="60" value="15" oninput="updateSettings('camino')"><span class="val-display" id="disp-camino-width">15</span></div>
+            <div class="control-row compact"><span class="control-label">Color</span><input type="color" id="camino-color" class="color-input" value="#ffffff" oninput="updateSettings('camino')"></div>
+            <div class="control-row"><span class="control-label">Punta</span><button class="cap-btn active" id="btn-cap-round" onclick="setLineCap('round')" title="Redondeada"><i class="bi bi-circle-fill" style="font-size: 0.6rem;"></i></button><button class="cap-btn" id="btn-cap-square" onclick="setLineCap('square')" title="Cuadrada"><i class="bi bi-square-fill" style="font-size: 0.6rem;"></i></button></div>
+        </div>
+        
+        <button class="tool-btn" id="btn-poi" onclick="setMode('poi')"><i class="bi bi-geo-alt-fill"></i> <span>Punto Interés</span></button>
+        <div class="settings-panel" id="poi-settings">
+            <div class="control-row"><span class="control-label">Altura</span><input type="range" id="poi-height" min="10" max="300" value="100" oninput="updateSettings('poi')"><span class="val-display" id="disp-poi-height">100</span></div>
+        </div>
+        
+        <div style="height:1px; background:#f1f5f9; margin:4px 0;"></div>
+        <button class="tool-btn delete-tool" id="btn-delete-tool" onclick="setMode('delete')"><i class="bi bi-trash"></i> <span>Eliminar</span></button>
+        </div>
+
+    <div class="floating-legend" id="undo-legend">
+        <i class="bi bi-arrow-counterclockwise"></i> Deshacer: <span class="key-badge">Ctrl</span> + <span class="key-badge">Z</span>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+        <button class="btn-cancel-draw" onclick="cancelDrawing()">Cancelar</button>
+        <span id="status-text">Dibujando...</span>
+        <button class="btn-finish" onclick="finishDrawing()">FINALIZAR</button>
+    </div>
+
+    <div class="modal-overlay" id="modal-lote">
+        <div class="modal-box">
+            <h3>Datos del Lote</h3>
+            <div id="lote-alert" class="alert alert-danger" style="display:none; padding:10px; margin-bottom:10px; background:#fee2e2; color:#ef4444; border-radius:8px; font-size:0.85rem;"></div>
+            <div style="display:flex; gap:10px;">
+                <div class="input-group" style="flex:1;"><label>Número</label><input type="text" class="styled-input" id="input-numero" placeholder="Ej. 10 o 1-A"></div>
+                <div class="input-group" style="flex:1.5;"><label>Estado</label><select class="styled-input" id="input-estado"><option value="1">🟢 Disponible</option><option value="2">🔵 Reservado</option><option value="3">🔴 Vendido</option></select></div>
+            </div>
+            <div class="input-group"><label>Precio ($)</label><input type="text" class="styled-input" id="input-precio" oninput="formatNumber(this)"></div>
+            <div class="input-group"><label>Superficie (m²)</label><input type="text" class="styled-input" id="input-superficie" oninput="formatNumber(this)"></div>
+            <div class="modal-footer"><button class="btn-delete" id="btn-lote-delete" style="display:none;" onclick="confirmDelete()"><i class="bi bi-trash"></i></button><button class="btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn-save" onclick="saveData()">Guardar</button></div>
+        </div>
+    </div>
+
+    <div id="poi-editor-panel">
+        <h3><i class="bi bi-pencil-square" style="color:#2563eb;"></i> Editar Punto</h3>
+        <div class="input-group"><label>Título</label><input type="text" class="styled-input" id="input-poi-titulo" oninput="updateActivePoi()"></div>
+        <div class="input-group"><label>Descripción</label><input type="text" class="styled-input" id="input-poi-desc" oninput="updateActivePoi()"></div>
+        
+        <div class="poi-controls-box">
+            <div class="poi-stacked-control">
+                <span>Tamaño</span>
+                <div class="segmented-control">
+                    <button class="segment-btn" onclick="setPoiSize(1, this)">S</button>
+                    <button class="segment-btn active" onclick="setPoiSize(2, this)">M</button>
+                    <button class="segment-btn" onclick="setPoiSize(3, this)">L</button>
+                </div>
+            </div>
+            
+            <div class="poi-stacked-control">
+                <span>Orientación</span>
+                <div class="segmented-control">
+                    <button class="segment-btn" id="btn-orient-left" onclick="setPoiOrient('left')"><i class="bi bi-text-left"></i> Izq</button>
+                    <button class="segment-btn active" id="btn-orient-right" onclick="setPoiOrient('right')">Der <i class="bi bi-text-right"></i></button>
+                </div>
+            </div>
+
+            <div class="poi-color-row" style="margin-top: 5px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:700;">Fondo</span>
+                    <input type="color" id="input-poi-bg" value="#ef4444" class="color-input" oninput="updateActivePoi()">
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:700;">Texto</span>
+                    <input type="color" id="input-poi-text" value="#ffffff" class="color-input" oninput="updateActivePoi()">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="background:transparent; border:none; padding:0; margin-top:10px;"><button class="btn-delete" id="btn-poi-delete" style="display:none;" onclick="confirmDelete()"><i class="bi bi-trash"></i></button><button class="btn-cancel" onclick="closeModal()">Cerrar</button><button class="btn-save" onclick="savePoi()">Guardar</button></div>
+    </div>
+
+    <div class="modal-overlay" id="dialog-overlay">
+        <div class="modal-box">
+            <div class="dialog-content">
+                <i class="bi bi-exclamation-triangle-fill dialog-icon"></i>
+                <div class="dialog-title">¿Estás seguro?</div>
+                <p id="dialog-message" class="dialog-text"></p>
+                <div class="dialog-buttons" id="dialog-buttons"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js",
+            "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.7.3/index.module.js",
+            "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.7.3/index.module.js"
+        }
+    }
+    </script>
+
+    <script src="js/api.js"></script>
+    <script type="module" src="js/visor-logic.js"></script>
+</body>
+</html>

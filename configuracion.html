@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - LOTIFY</title>
+    <link rel="icon" type="image/png" href="fav.png.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .logo-upload-area {
+            width: 100%; height: 180px;
+            border: 2px dashed #cbd5e1; border-radius: 16px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #f8fafc; cursor: pointer; transition: all 0.2s;
+            position: relative; overflow: hidden;
+        }
+        .logo-upload-area:hover { border-color: var(--primary); background: #eff6ff; }
+        .logo-preview { max-height: 120px; object-fit: contain; margin-bottom: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><a href="dashboard.html" class="logo-text" style="text-decoration:none;"><i class="bi bi-bounding-box-circles"></i> LOTI<span>FY</span></a></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="sidebar-link"><i class="bi bi-grid-fill"></i> Mis Proyectos</a></li>
+                <li><a href="gestion-lotes.html" class="sidebar-link"><i class="bi bi-list-check"></i> Gestión Lotes</a></li>
+                <li><a href="clientes.html" class="sidebar-link"><i class="bi bi-people"></i> Clientes</a></li>
+               <li><a href="ventas.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i> Ventas & Visitas</a></li>
+                <li><a href="#" class="sidebar-link active"><i class="bi bi-gear"></i> Configuración</a></li>
+                <li><a href="equipo.html" class="sidebar-link"><i class="bi bi-shield-lock"></i> Equipo</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="localStorage.removeItem('userToken');window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Salir</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <h1 class="page-title">Configuración</h1>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                
+                <div style="background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
+                    <h3 style="margin-top:0; color:#0f172a;">Mi Perfil</h3>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="text" id="profile-email" class="styled-input" readonly style="background:#f1f5f9; color:#64748b;">
+                    </div>
+                    <div style="padding:15px; background:#eff6ff; border-radius:10px; color:#1e40af; font-size:0.85rem;">
+                        <i class="bi bi-info-circle-fill"></i> Para cambios de cuenta, contacta a soporte.
+                    </div>
+                </div>
+
+                <div style="background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
+                    <h3 style="margin-top:0; color:#0f172a;">Logo Empresa</h3>
+                    <p style="font-size:0.9rem; color:#64748b; margin-bottom:20px;">Aparecerá en la esquina de tus visores.</p>
+                    
+                    <form id="logo-form">
+                        <div class="logo-upload-area" onclick="document.getElementById('logo-input').click()">
+                            <input type="file" id="logo-input" accept="image/png" style="display:none;" onchange="previewLogo(this)">
+                            
+                            <div id="upload-placeholder" style="text-align:center;">
+                                <i class="bi bi-cloud-arrow-up" style="font-size:2rem; color:#cbd5e1;"></i>
+                                <div style="font-weight:600; color:#64748b; margin-top:10px;">Subir PNG</div>
+                            </div>
+
+                            <img id="logo-preview-img" class="logo-preview">
+                        </div>
+
+                        <button type="button" class="btn-primary-block" style="margin-top:20px;" onclick="saveLogo()">
+                            <i class="bi bi-save"></i> Guardar Logo
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const token = localStorage.getItem('userToken');
+        if(!token) window.location.href = 'index.html';
+
+        // 1. Cargar Datos
+        async function loadData() {
+            try {
+                const res = await fetch('http://localhost:3000/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } });
+                const user = await res.json();
+                
+                document.getElementById('profile-email').value = user.email;
+                if(user.logo_url) {
+                    document.getElementById('upload-placeholder').style.display = 'none';
+                    const img = document.getElementById('logo-preview-img');
+                    img.src = user.logo_url;
+                    img.style.display = 'block';
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // 2. Previsualizar
+        function previewLogo(input) {
+            const file = input.files[0];
+            if(file) {
+                if(file.type !== 'image/png') return alert('Solo archivos PNG');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('upload-placeholder').style.display = 'none';
+                    const img = document.getElementById('logo-preview-img');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 3. Guardar
+        async function saveLogo() {
+            const input = document.getElementById('logo-input');
+            if(input.files.length === 0) return alert('Selecciona una imagen.');
+
+            const btn = document.querySelector('#logo-form button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Subiendo...';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('logo', input.files[0]);
+
+                const res = await fetch('http://localhost:3000/api/auth/logo', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if(!res.ok) throw new Error('Error al subir');
+                
+                btn.innerHTML = '¡Guardado!';
+                btn.style.background = '#10b981';
+                setTimeout(() => { btn.innerHTML = originalText; btn.style.background = ''; btn.disabled = false; }, 2000);
+
+            } catch(e) {
+                alert(e.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

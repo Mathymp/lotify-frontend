@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Lotes - LOTIFY</title>
+    <link rel="icon" type="image/png" href="fav.png.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><div class="logo-text"><i class="bi bi-bounding-box-circles"></i> LOTI<span>FY</span></div></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="sidebar-link"><i class="bi bi-grid-fill"></i> Mis Proyectos</a></li>
+                <li><a href="gestion-lotes.html" class="sidebar-link active"><i class="bi bi-list-check"></i> Gestión Lotes</a></li>
+                <li><a href="clientes.html" class="sidebar-link"><i class="bi bi-people"></i> Clientes</a></li>
+                <li><a href="ventas.html" class="sidebar-link"><i class="bi bi-currency-dollar"></i> Ventas & Visitas</a></li>
+                <li><a href="configuracion.html" class="sidebar-link"><i class="bi bi-gear"></i> Configuración</a></li>
+                <li><a href="equipo.html" class="sidebar-link"><i class="bi bi-shield-lock"></i> Equipo</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="localStorage.removeItem('userToken');window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Salir</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="page-title">Gestión Rápida de Inventario</h1>
+                    <p style="color:#64748b; margin-top:5px;">Edita precios y estados sin entrar al visor 360.</p>
+                </div>
+                
+                <div style="width: 300px;">
+                    <select id="project-select" class="styled-input" onchange="loadLotesTable(this.value)">
+                        <option value="">Selecciona un Proyecto...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="loading-state" style="display:none; text-align:center; padding:40px; color:#64748b;">
+                <div class="spinner-border" style="margin-bottom:10px;"></div>
+                <p>Cargando inventario...</p>
+            </div>
+
+            <div id="empty-state" style="text-align:center; padding:60px; background:white; border-radius:16px; border:1px solid #e2e8f0; border-style:dashed;">
+                <i class="bi bi-arrow-up-circle" style="font-size:3rem; color:#cbd5e1;"></i>
+                <h3 style="color:#64748b; margin-top:15px;">Selecciona un proyecto arriba</h3>
+                <p style="color:#94a3b8;">Para ver la tabla de lotes disponibles.</p>
+            </div>
+
+            <div id="table-container" class="table-responsive hidden">
+                <table class="management-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Lote #</th>
+                            <th width="20%">Estado</th>
+                            <th width="25%">Precio ($)</th>
+                            <th width="20%">Superficie (m²)</th>
+                            <th width="15%">Última Mod.</th>
+                            <th width="10%" style="text-align:center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lotes-tbody">
+                        </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const token = localStorage.getItem('userToken');
+        if(!token) window.location.href = 'index.html';
+
+        // 1. Cargar Proyectos al Select
+        async function init() {
+            try {
+                const projects = await getProjects();
+                const select = document.getElementById('project-select');
+                projects.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.innerText = p.nombre;
+                    select.appendChild(opt);
+                });
+            } catch (e) { alert(e.message); }
+        }
+
+        // 2. Cargar Tabla de Lotes
+        async function loadLotesTable(projectId) {
+            if(!projectId) {
+                document.getElementById('empty-state').style.display = 'block';
+                document.getElementById('table-container').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('loading-state').style.display = 'block';
+            document.getElementById('table-container').classList.add('hidden');
+
+            try {
+                const allElements = await getLotes(projectId);
+                // Filtramos SOLO los que son de tipo 'lote' (ignoramos caminos y POIs)
+                const lotes = allElements.filter(e => e.tipo === 'lote');
+                
+                // Ordenar por número de lote (intentando orden numérico si es posible)
+                lotes.sort((a, b) => {
+                    const numA = parseInt(a.numero_lote.replace(/\D/g,'')) || 0;
+                    const numB = parseInt(b.numero_lote.replace(/\D/g,'')) || 0;
+                    return numA - numB;
+                });
+
+                renderRows(lotes);
+                
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('table-container').classList.remove('hidden');
+
+            } catch (error) {
+                alert("Error al cargar lotes: " + error.message);
+                document.getElementById('loading-state').style.display = 'none';
+            }
+        }
+
+        function renderRows(lotes) {
+            const tbody = document.getElementById('lotes-tbody');
+            tbody.innerHTML = '';
+
+            if(lotes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px;">No hay lotes dibujados en este proyecto aún. Ve al visor para dibujarlos.</td></tr>';
+                return;
+            }
+
+            lotes.forEach(lote => {
+                const tr = document.createElement('tr');
+                
+                // Formateadores
+                const precioVal = parseInt(lote.precio || 0).toLocaleString('es-CL');
+                const supVal = parseInt(lote.superficie || 0).toLocaleString('es-CL');
+                
+                tr.innerHTML = `
+                    <td style="font-weight:700; color:#0f172a;">${lote.numero_lote}</td>
+                    <td>
+                        <select class="status-select status-${lote.estado_id}" onchange="changeStatusColor(this)" id="status-${lote.id}">
+                            <option value="1" ${lote.estado_id == 1 ? 'selected' : ''}>Disponible</option>
+                            <option value="2" ${lote.estado_id == 2 ? 'selected' : ''}>Reservado</option>
+                            <option value="3" ${lote.estado_id == 3 ? 'selected' : ''}>Vendido</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="table-input" value="${precioVal}" id="precio-${lote.id}" oninput="formatTableNumber(this)">
+                    </td>
+                    <td>
+                        <input type="text" class="table-input" value="${supVal}" id="sup-${lote.id}" oninput="formatTableNumber(this)">
+                    </td>
+                    <td style="font-size:0.8rem; color:#94a3b8;">
+                        ${new Date().toLocaleDateString()} </td>
+                    <td style="text-align:center;">
+                        <button class="btn-icon-save" onclick="quickSave(${lote.id})" title="Guardar Cambios">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Utilidad visual para el select
+        window.changeStatusColor = function(select) {
+            select.className = 'status-select status-' + select.value;
+        }
+
+        // Formateador de miles en input
+        window.formatTableNumber = function(input) {
+            let val = input.value.replace(/\D/g, '');
+            input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Guardado Rápido
+        window.quickSave = async function(loteId) {
+            const btn = event.currentTarget; // El botón que se clickeó
+            const originalHtml = btn.innerHTML;
+            
+            try {
+                btn.innerHTML = '<div class="spinner-border" style="width:1rem; height:1rem; border-width:2px;"></div>';
+                
+                const estado = document.getElementById(`status-${loteId}`).value;
+                const precio = document.getElementById(`precio-${loteId}`).value.replace(/\./g, '');
+                const superficie = document.getElementById(`sup-${loteId}`).value.replace(/\./g, '');
+                
+                // Usamos la API existente updateLote
+                // NOTA: updateLote necesita todos los campos obligatorios del backend. 
+                // Asegúrate que tu backend permita update parcial o envía los datos necesarios.
+                // Como es una edición rápida, enviamos lo que tenemos.
+                
+                // Primero necesitamos el número de lote (no lo estamos editando pero la API podría requerirlo)
+                // Para simplificar, asumimos que el backend hace un update dinámico o enviamos el numero actual si fuera necesario.
+                // Si tu `loteController.js` requiere `numero_lote`, tendrías que leerlo de la celda.
+                
+                const row = btn.closest('tr');
+                const numeroLote = row.cells[0].innerText; // Obtenemos el numero de la columna 1
+
+                const payload = {
+                    numero_lote: numeroLote,
+                    estado_id: estado,
+                    precio: precio,
+                    superficie: superficie
+                };
+
+                await updateLote(loteId, payload);
+
+                // Feedback Visual Éxito
+                btn.style.background = '#dcfce7';
+                btn.style.color = '#166534';
+                btn.innerHTML = '<i class="bi bi-check2-all"></i>';
+                
+                setTimeout(() => {
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                }, 2000);
+
+            } catch (e) {
+                alert('Error al guardar: ' + e.message);
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
