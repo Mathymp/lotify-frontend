@@ -171,8 +171,8 @@
             .then(r => r.json())
             .then(user => {
                 currentUserRole = user.rol || 'vendedor';
+                // FIX SIDEBAR: Ocultar si no es admin
                 if(currentUserRole !== 'admin') {
-                    // Ocultar elementos admin si existieran (ej. eliminar)
                     document.querySelectorAll('.admin-only-menu').forEach(el => el.style.display = 'none');
                 }
                 loadInitialData(); // Iniciar app
@@ -353,14 +353,18 @@
         });
 
         async function fetchAllData() {
-            // FIX: Reemplazar fetch local por fetch a API_URL
-            const [visitas, ventas] = await Promise.all([
-                fetch(`${API_URL}/crm/visitas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
-                fetch(`${API_URL}/crm/ventas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
-            ]);
-            visitasData = visitas;
-            ventasData = ventas;
-            applyFilters();
+            try {
+                // FIX: Reemplazar fetch local por fetch a API_URL
+                const [visitas, ventas] = await Promise.all([
+                    fetch(`${API_URL}/crm/visitas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+                    fetch(`${API_URL}/crm/ventas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
+                ]);
+                visitasData = visitas;
+                ventasData = ventas;
+                applyFilters();
+            } catch (e) {
+                 document.getElementById('ventas-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:#ef4444;">Error al cargar datos: El servidor no responde.</td></tr>';
+            }
         }
 
         function applyFilters() {

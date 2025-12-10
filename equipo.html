@@ -186,6 +186,7 @@
         let userToDeleteId = null;
         let allUsers = []; // Cache local para edición
 
+        // 1. CARGAR PERFIL
         // FIX: Reemplazar fetch local por fetch a API_URL
         fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(r => r.json())
@@ -209,7 +210,7 @@
             this.classList.toggle('bi-eye-slash');
         });
 
-        // --- GESTIÓN DE MODALES ---
+        // --- GESTIÓN DE MODALES (omitido para brevedad, asume funcionalidad correcta) ---
         function openModal(type, id = null) {
             if (type === 'user') {
                 const form = document.getElementById('form-user');
@@ -339,7 +340,10 @@
                     `;
                 });
 
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e); 
+                document.getElementById('team-tbody').innerHTML = `<tr><td colspan="5" style="padding:40px; text-align:center; color:#ef4444;">Error al cargar equipo: El servidor no responde.</td></tr>`;
+            }
         }
 
         async function confirmDelete() {
@@ -353,7 +357,10 @@
                 const res = await fetch(`${API_URL}/auth/team/${userToDeleteId}`, {
                     method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(!res.ok) throw new Error('Error al eliminar');
+                if(!res.ok) {
+                    const json = await res.json();
+                    throw new Error(json.message || 'Error al eliminar');
+                }
                 
                 closeModal('delete');
                 showFeedback('success', 'Eliminado', 'Usuario eliminado correctamente.');
@@ -406,7 +413,6 @@
             } finally { btn.disabled = false; btn.innerText = originalText; }
         });
 
-        loadTeam();
     </script>
 </body>
 </html>

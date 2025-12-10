@@ -148,10 +148,17 @@
             .then(r => r.json())
             .then(user => {
                 currentUserRole = user.rol || 'vendedor';
+                // FIX SIDEBAR: Si es admin, mostrar los enlaces de admin
                 if(currentUserRole === 'admin') {
                     document.querySelectorAll('.admin-only-menu').forEach(el => el.classList.remove('admin-only-menu'));
                 }
                 loadClientes();
+            })
+            .catch(error => {
+                // Si falla, el rol queda como 'vendedor' por defecto y los enlaces de admin se ocultan,
+                // que es el comportamiento esperado para la seguridad.
+                console.error("Fallo al verificar rol: ", error);
+                loadClientes(); // Intenta cargar clientes de todas formas.
             });
 
         // --- VALIDACIÓN RUT (MÓDULO 11) ---
@@ -193,8 +200,9 @@
             }
         }
 
-        // --- GESTIÓN DE MODALES ---
+        // --- GESTIÓN DE MODALES (omitido para brevedad, asume funcionalidad correcta) ---
         function openModal(type, id = null) {
+            // ... (código original de openModal)
             if (type === 'cliente') {
                 const modal = document.getElementById('modal-cliente');
                 const title = document.getElementById('modal-title');
@@ -246,7 +254,9 @@
                 });
                 
                 if(!res.ok) {
-                    throw new Error('Error al eliminar. Verifique que no tenga ventas o visitas asociadas.');
+                    // FIX: Lanzamos el error con el mensaje de la API si está disponible
+                    const json = await res.json();
+                    throw new Error(json.message || 'Error al eliminar. Verifique que no tenga ventas o visitas asociadas.');
                 }
                 loadClientes(); closeModal('delete');
             } catch(e) { alert(e.message); } 
@@ -286,7 +296,10 @@
                         </tr>
                     `;
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e); 
+                document.getElementById('clients-table-body').innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:#ef4444;">Error al cargar datos: El servidor no responde.</td></tr>`;
+            }
         }
 
         document.getElementById('form-cliente').addEventListener('submit', async (e) => {
@@ -306,9 +319,15 @@
                 if(id) { url += `/${id}`; method = 'PUT'; }
                 
                 // FIX: Reemplazar fetch local por fetch a API_URL
-                await fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(data) });
+                const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(data) });
+                
+                if(!res.ok) {
+                    const json = await res.json();
+                    throw new Error(json.message || 'Error al guardar el cliente.');
+                }
+
                 closeModal('cliente'); loadClientes();
-            } catch(err) { alert('Error al guardar'); } 
+            } catch(err) { alert(err.message); } 
             finally { btn.disabled = false; btn.innerText = "Guardar Cliente"; }
         });
     </script>

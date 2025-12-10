@@ -137,7 +137,10 @@
                     body: formData
                 });
 
-                if(!res.ok) throw new Error('Error al subir');
+                if(!res.ok) {
+                    const json = await res.json();
+                    throw new Error(json.message || 'Error al subir el logo');
+                }
                 
                 btn.innerHTML = '¡Guardado!';
                 btn.style.background = '#10b981';
