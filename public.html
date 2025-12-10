@@ -141,7 +141,8 @@
         import { Viewer } from '@photo-sphere-viewer/core';
         import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 
-        const API_URL = 'http://localhost:3000/api/public';
+        // FIX: Reemplazamos localhost por la URL de Render para la API pública
+        const API_URL = 'https://lotify-backend.onrender.com/api/public';
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('s'); 
         const TEXTS = { 1: 'DISPONIBLE', 2: 'RESERVADO', 3: 'VENDIDO' };
@@ -190,6 +191,7 @@
         async function init() {
             if(!slug) return alert('Proyecto no especificado');
             try {
+                // FIX: Reemplazar fetch local por fetch a API_URL
                 const pRes = await fetch(`${API_URL}/project/${slug}`);
                 if(!pRes.ok) throw new Error('Proyecto no encontrado');
                 const project = await pRes.json();
@@ -210,6 +212,7 @@
                 markersPlugin = viewer.getPlugin(MarkersPlugin);
                 viewer.addEventListener('zoom-updated', updateAllMarkersScale);
 
+                // FIX: Reemplazar fetch local por fetch a API_URL
                 const lRes = await fetch(`${API_URL}/lotes/${project.id}`);
                 const elements = await lRes.json();
 

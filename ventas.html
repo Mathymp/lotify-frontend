@@ -155,6 +155,7 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script> 
     <script src="js/api.js"></script>
     <script>
+        const API_URL = 'https://lotify-backend.onrender.com/api'; // Inyección de URL de Render
         const token = localStorage.getItem('userToken');
         if(!token) window.location.href = 'index.html';
 
@@ -165,7 +166,8 @@
         let currentUserRole = 'vendedor';
 
         // 1. CARGAR PERFIL
-        fetch('http://localhost:3000/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
+        // FIX: Reemplazar fetch local por fetch a API_URL
+        fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(r => r.json())
             .then(user => {
                 currentUserRole = user.rol || 'vendedor';
@@ -202,11 +204,6 @@
             if(id === 'crm') { document.getElementById('crm-form').reset(); resetFinanceFields(); }
         }
         
-        // ... (Funciones auxiliares: resetFinanceFields, setType, loadLotes, handleLoteChange, updateCalculations, crm-form submit) ...
-        // [MANTENER EL CÓDIGO JS DE VENTAS.HTML ORIGINAL AQUÍ, NO CAMBIA MUCHO EXCEPTO LA CARGA INICIAL]
-        // Para brevedad, asumimos que el resto del script de lógica de negocio se mantiene igual
-        // ya que los vendedores SÍ pueden crear ventas. Solo no pueden eliminar.
-        
         function resetFinanceFields() {
             document.getElementById('reserva-found-msg').style.display = 'none';
             document.getElementById('input-monto-reserva').disabled = false;
@@ -238,9 +235,10 @@
         }
 
         async function loadInitialData() {
+            // FIX: Reemplazar fetch local por fetch a API_URL
             const [proyectos, clientes] = await Promise.all([
-                fetch('http://localhost:3000/api/projects', { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
-                fetch('http://localhost:3000/api/crm/clientes', { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
+                fetch(`${API_URL}/projects`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+                fetch(`${API_URL}/crm/clientes`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
             ]);
             const selP = document.getElementById('select-proyecto'); selP.innerHTML = '<option value="">Selecciona...</option>';
             const filterP = document.getElementById('filter-proyecto'); filterP.innerHTML = '<option value="">Todos los Proyectos</option>';
@@ -255,7 +253,8 @@
         async function loadLotes(projectId) {
             if(!projectId) return;
             const sel = document.getElementById('select-lote'); sel.disabled = true; sel.innerHTML = '<option>Cargando...</option>';
-            const res = await fetch(`http://localhost:3000/api/lotes/${projectId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            // FIX: Reemplazar fetch local por fetch a API_URL
+            const res = await fetch(`${API_URL}/lotes/${projectId}`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             lotesData = data.filter(l => l.tipo === 'lote');
             sel.innerHTML = '<option value="">Selecciona lote...</option>';
@@ -282,7 +281,8 @@
 
             if (type === 'venta') {
                 try {
-                    const res = await fetch(`http://localhost:3000/api/crm/reserva/${loteId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    // FIX: Reemplazar fetch local por fetch a API_URL
+                    const res = await fetch(`${API_URL}/crm/reserva/${loteId}`, { headers: { 'Authorization': `Bearer ${token}` } });
                     const reserva = await res.json();
                     if (reserva) {
                         document.getElementById('reserva-found-msg').style.display = 'flex';
@@ -326,7 +326,8 @@
             
             if (type === 'visita') {
                 body.fecha_visita = `${document.getElementById('fecha-input').value}T${document.getElementById('hora-input').value}:00`;
-                await fetch('http://localhost:3000/api/crm/visitas', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
+                // FIX: Reemplazar fetch local por fetch a API_URL
+                await fetch(`${API_URL}/crm/visitas`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
             } else {
                 if(!body.lote_id) return alert('Selecciona un lote.');
                 
@@ -344,16 +345,18 @@
                     body.valor_final = body.monto_reserva; 
                 }
 
-                await fetch('http://localhost:3000/api/crm/ventas', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
+                // FIX: Reemplazar fetch local por fetch a API_URL
+                await fetch(`${API_URL}/crm/ventas`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
             }
             closeModal('crm');
             fetchAllData(); 
         });
 
         async function fetchAllData() {
+            // FIX: Reemplazar fetch local por fetch a API_URL
             const [visitas, ventas] = await Promise.all([
-                fetch('http://localhost:3000/api/crm/visitas', { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
-                fetch('http://localhost:3000/api/crm/ventas', { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
+                fetch(`${API_URL}/crm/visitas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+                fetch(`${API_URL}/crm/ventas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
             ]);
             visitasData = visitas;
             ventasData = ventas;
