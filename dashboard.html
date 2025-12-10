@@ -934,7 +934,7 @@
         async function loadProfileAndProjects() {
             try {
                 // PRIMERO: Cargar perfil usando la API (ya tiene la URL correcta)
-                const user = await getMe(); // Asumiendo que esta función existe o la creamos
+                const user = await getMe(); 
                 
                 document.getElementById('user-name-display').innerText = user.nombre_usuario || 'Usuario';
                 currentUserRole = user.rol || 'vendedor'; 
@@ -1117,7 +1117,8 @@
 
         // --- FUNCIÓN ABRIR MODAL COMPARTIR ---
         function openShareModal(slug) {
-            const publicLink = `${window.location.origin}/frontend/public.html?s=${slug}`;
+            // FIX CRÍTICO: Eliminamos el prefijo /frontend/ de la URL pública
+            const publicLink = `${window.location.origin}/public.html?s=${slug}`;
             const iframeCode = `<iframe src="${publicLink}" width="100%" height="600px" frameborder="0" style="border: none;"></iframe>`;
             
             document.getElementById('share-link-input').value = publicLink;
@@ -1178,7 +1179,8 @@
                         month: 'short',
                         year: 'numeric'
                     });
-                    const publicLink = `${window.location.origin}/frontend/public.html?s=${p.slug_publico}`;
+                    // FIX CRÍTICO: publicLink ya no tiene /frontend/
+                    const publicLink = `${window.location.origin}/public.html?s=${p.slug_publico}`;
                     
                     let imageHTML = '';
                     if (p.imagen_360_url) {
@@ -1199,6 +1201,7 @@
 
                     if (currentUserRole === 'admin') {
                         // ADMIN: Editor (visor.html) + Datos + Ver Público + Borrar
+                        // FIX: visor.html tampoco lleva /frontend/
                         mainButton = `
                             <a href="visor.html?projectId=${p.id}" class="btn-card-action btn-editor-blue">
                                 <i class="bi bi-pencil-fill"></i> Editor 360°
