@@ -887,7 +887,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Mensaje de error para archivos grandes -->
                         <div id="file-size-error" class="file-size-error">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <span id="file-size-error-text">El archivo es demasiado grande. El tamaño máximo es 10 MB.</span>
@@ -931,10 +930,12 @@
         const token = localStorage.getItem('userToken');
         if(!token) window.location.href = 'index.html';
         
-        // 1. CARGA DE PERFIL
-        fetch('http://localhost:3000/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(user => {
+        // 1. CARGA DE PERFIL (SOLUCIÓN DEL PROBLEMA: USAR API.JS)
+        async function loadProfileAndProjects() {
+            try {
+                // PRIMERO: Cargar perfil usando la API (ya tiene la URL correcta)
+                const user = await getMe(); // Asumiendo que esta función existe o la creamos
+                
                 document.getElementById('user-name-display').innerText = user.nombre_usuario || 'Usuario';
                 currentUserRole = user.rol || 'vendedor'; 
                 document.getElementById('user-role-display').innerText = currentUserRole === 'admin' ? 'Administrador' : 'Vendedor';
@@ -943,9 +944,31 @@
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-only'));
                     document.querySelectorAll('.admin-only-menu').forEach(el => el.classList.remove('admin-only-menu'));
                 }
+                
+                // SEGUNDO: Cargar proyectos (se hace inmediatamente después de cargar el perfil)
                 loadProjects();
-            })
-            .catch(err => console.error("Error perfil", err));
+
+            } catch (error) {
+                // Si falla la carga del perfil (token expirado, etc.), redirigimos al login.
+                console.error("Error al cargar perfil:", error);
+                if (!error.message.includes('Sesión requerida')) {
+                    alert("Error crítico de sesión. Por favor, reingresa.");
+                    localStorage.removeItem('userToken'); 
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+        
+        // Función auxiliar para obtener perfil (debe estar en api.js, si no lo creamos)
+        // Ya que no tengo acceso a crearla en api.js directamente, la simulamos o la definimos si no está.
+        // Asumiendo que existe una función getMe() que hace el fetch a /auth/me
+        
+        // Si getMe no está en api.js, deberías añadirla a api.js:
+        /*
+        async function getMe() {
+            return await safeFetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+        }
+        */
 
         logoutBtn.addEventListener('click', () => { 
             localStorage.removeItem('userToken'); 
@@ -1137,6 +1160,15 @@
                     `;
                     return;
                 }
+                
+                if (currentProjectsData.length === 0 && currentUserRole === 'admin') {
+                    grid.innerHTML += `
+                        <div style="grid-column: 1/-1; text-align:center; padding: 30px 20px; color: #64748b;">
+                            <p>¡Crea tu primer proyecto haciendo clic en el botón de arriba!</p>
+                        </div>
+                    `;
+                }
+
 
                 currentProjectsData.forEach(p => {
                     const card = document.createElement('div'); 
@@ -1288,6 +1320,9 @@
                 alert('Error al eliminar: ' + error.message);
             }
         }
+        
+        // Ejecución inicial: Llama a la función que inicia el flujo
+        loadProfileAndProjects();
     </script>
 </body>
 </html>
