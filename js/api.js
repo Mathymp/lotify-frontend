@@ -1,33 +1,26 @@
-const API_URL = 'http://localhost:3000/api';
+// =========================================================================
+// ⚠️ 1. CAMBIA ESTA URL POR LA URL PÚBLICA DE TU API (Backend)
+// =========================================================================
+const API_URL = 'https://lotify-backend.onrender.com/api'; // <--- URL PÚBLICA DEL BACKEND
+// =========================================================================
+
 const getToken = () => localStorage.getItem('userToken');
 
 /**
  * Función para manejar respuestas de Fetch API.
- * Procesa la respuesta PRIMERO para ver si el servidor envió un mensaje de error específico.
  */
 async function handleResponse(res) {
   let data = {};
-  
-  // 1. Intentamos obtener el mensaje del servidor (JSON)
   try {
-      const resClone = res.clone(); // Clonamos por si necesitamos el texto crudo
+      const resClone = res.clone();
       const text = await resClone.text();
-      if (text.length > 0) {
-          data = JSON.parse(text);
-      }
-  } catch (e) {
-      // Si falla el JSON, data se queda vacío
-  }
+      if (text.length > 0) { data = JSON.parse(text); }
+  } catch (e) { /* No body */ }
 
-  // 2. Manejo de Errores HTTP
   if (!res.ok) {
-      // CASO ESPECIAL: 401 (No autorizado)
       if (res.status === 401) {
-          if (data.message) {
-              throw new Error(data.message);
-          }
+          if (data.message) { throw new Error(data.message); }
           localStorage.removeItem('userToken');
-          
           if (window.location.pathname.indexOf('index.html') === -1) {
               alert("⚠️ Sesión expirada. Por favor ingresa nuevamente.");
               window.location.href = 'index.html';
@@ -43,7 +36,7 @@ async function handleResponse(res) {
 }
 
 /**
- * Wrapper de fetch para manejar errores de red (cuando el servidor está apagado).
+ * Wrapper de fetch para manejar errores de red.
  */
 const safeFetch = async (url, options = {}) => {
     try {
@@ -51,7 +44,7 @@ const safeFetch = async (url, options = {}) => {
         return await handleResponse(res);
     } catch (e) {
         if (e.message.includes('Failed to fetch')) {
-            throw new Error("❌ Error de conexión: El servidor no responde. Revisa si el backend está encendido.");
+            throw new Error("❌ Error de conexión: El servidor no responde. Revisa si el backend está encendido y la URL es correcta.");
         }
         throw e;
     }
@@ -65,7 +58,6 @@ async function registerUser(nombre_usuario, email, password) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nombre_usuario, email, password })
   });
-  
   if (!data.token) throw new Error('Error: El servidor no devolvió un token válido.');
   return data;
 }
@@ -75,7 +67,6 @@ async function loginUser(email, password) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
-  
   if (!data.token) throw new Error('Error: El servidor no devolvió un token válido.');
   return data;
 }
@@ -83,13 +74,10 @@ async function loginUser(email, password) {
 // --- FUNCIONES DE PROYECTOS ---
 
 async function getProjects() {
-  return await safeFetch(`${API_URL}/projects`, {
-    headers: { 'Authorization': `Bearer ${getToken()}` }
-  });
+  return await safeFetch(`${API_URL}/projects`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
 }
 
 async function createProject(formData) {
-  // Nota: Al enviar FormData, no establezcas Content-Type manual (el navegador lo hace)
   const res = await fetch(`${API_URL}/projects`, {
     method: 'POST', headers: { 'Authorization': `Bearer ${getToken()}` },
     body: formData
@@ -97,11 +85,9 @@ async function createProject(formData) {
   return await handleResponse(res);
 }
 
-// --- NUEVA FUNCIÓN: ACTUALIZAR PROYECTO ---
 async function updateProject(id, formData) {
-    // Usamos PUT para actualizar
     const res = await fetch(`${API_URL}/projects/${id}`, {
-        method: 'PUT', // Asegúrate de que tu backend tenga esta ruta habilitada
+        method: 'PUT',
         headers: { 'Authorization': `Bearer ${getToken()}` },
         body: formData
     });
@@ -109,9 +95,7 @@ async function updateProject(id, formData) {
 }
 
 async function getProjectById(id) {
-  return await safeFetch(`${API_URL}/projects/${id}`, {
-    headers: { 'Authorization': `Bearer ${getToken()}` }
-  });
+  return await safeFetch(`${API_URL}/projects/${id}`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
 }
 
 async function deleteProject(id) {
@@ -119,7 +103,6 @@ async function deleteProject(id) {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${getToken()}` }
   });
-  // 204 No Content no tiene body, así que verificamos ok directamente
   if (!res.ok) await handleResponse(res);
 }
 
@@ -135,9 +118,7 @@ async function saveLote(loteData) {
 }
 
 async function getLotes(projectId) {
-    return await safeFetch(`${API_URL}/lotes/${projectId}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
+    return await safeFetch(`${API_URL}/lotes/${projectId}`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
 }
 
 async function updateLote(id, loteData) {
