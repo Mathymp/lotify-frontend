@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Visita Virtual - LOTIFY</title>
     <link rel="icon" type="image/png" href="fav.png.png">
     
@@ -14,36 +14,36 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     
     <style>
-        /* --- ESTILOS ORIGINALES RESTAURADOS --- */
+        /* --- ESTILOS BASE --- */
         :root { --primary: #2563eb; --secondary: #64748b; --dark: #0f172a; }
-        body { margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         #viewer { width: 100vw; height: 100vh; background: var(--dark); }
 
-        .company-logo { position: fixed; top: 30px; right: 30px; z-index: 100; height: 80px; width: auto; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); }
+        /* Logo Empresa */
+        .company-logo { 
+            position: fixed; top: 30px; right: 30px; z-index: 100; 
+            height: 80px; width: auto; object-fit: contain; pointer-events: none; 
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); 
+        }
         
+        /* Tarjeta Proyecto (Arriba Izq) */
         .project-header { 
-            position: fixed; top: 30px; 
-            left: 25px; 
-            z-index: 100; 
-            max-width: 380px;
+            position: fixed; top: 30px; left: 25px; z-index: 100; max-width: 380px;
             display: flex; justify-content: flex-start; 
             animation: slideInLeft 0.7s cubic-bezier(0.25, 0.8, 0.25, 1); 
         }
         
         .project-card-header { 
-            background: rgba(255, 255, 255, 0.88); 
-            backdrop-filter: blur(12px); 
-            padding: 18px 28px;
-            border-radius: 16px 50px 50px 16px; 
+            background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px); 
+            padding: 18px 28px; border-radius: 16px 50px 50px 16px; 
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 5px 10px -5px rgba(0,0,0,0.05);
-            text-align: left; 
-            border: 1px solid rgba(255,255,255,0.5);
+            text-align: left; border: 1px solid rgba(255,255,255,0.5);
             border-left: 4px solid var(--primary); 
         }
         
         .project-card-header h1 { 
-            margin: 0; font-size: 1.4rem;
-            font-weight: 800; color: var(--dark); line-height: 1.1; letter-spacing: -0.5px;
+            margin: 0; font-size: 1.4rem; font-weight: 800; color: var(--dark); 
+            line-height: 1.1; letter-spacing: -0.5px;
         }
         
         .project-location { 
@@ -58,10 +58,26 @@
             font-weight: 500; line-height: 1.4; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;
         }
 
-        .legal-bar { position: fixed; bottom: 20px; width: 100%; z-index: 80; display: flex; justify-content: center; pointer-events: none; }
-        .legal-pill { background: rgba(0, 0, 0, 0.75); padding: 8px 20px; border-radius: 30px; font-size: 0.7rem; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; gap: 8px; text-align: center; }
-        .powered-by { position: fixed; bottom: 8px; right: 20px; z-index: 100; font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); font-weight: 800; pointer-events: none; text-transform: uppercase; letter-spacing: 1px; text-shadow: none; }
+        /* --- ELEMENTOS FLOTANTES INFERIORES --- */
+        .legal-bar { 
+            position: fixed; bottom: 20px; width: 100%; z-index: 80; 
+            display: flex; justify-content: center; pointer-events: none; 
+            transition: all 0.3s ease;
+        }
+        .legal-pill { 
+            background: rgba(0, 0, 0, 0.75); padding: 8px 20px; border-radius: 30px; 
+            font-size: 0.7rem; color: white; font-weight: 700; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(4px); 
+            display: flex; align-items: center; gap: 8px; text-align: center; 
+        }
+        
+        .powered-by { 
+            position: fixed; bottom: 8px; right: 20px; z-index: 100; 
+            font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); font-weight: 800; 
+            pointer-events: none; text-transform: uppercase; letter-spacing: 1px; text-shadow: none; 
+        }
 
+        /* --- MARCADORES Y TARJETAS --- */
         .psv-marker-svg, .polygon-marker { filter: none !important; box-shadow: none !important; drop-shadow: none !important; }
         .psv-tooltip { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
         .psv-tooltip-content { background: transparent !important; padding: 0 !important; border-radius: 0 !important; }
@@ -70,6 +86,7 @@
             background: white; border-radius: 12px; padding: 8px 12px;
             text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
             margin-bottom: 12px; white-space: nowrap; position: relative; text-shadow: none !important;
+            pointer-events: none; 
         }
         .lote-card-nano::after {
             content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px;
@@ -80,11 +97,10 @@
             font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; 
             display: inline-block; margin-bottom: 4px; color: white !important; 
             padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            text-shadow: none !important;
         }
 
-        .nano-price { font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.1; display: block; text-shadow: none !important; }
-        .nano-meta { font-size: 0.7rem; color: var(--secondary); font-weight: 600; display: block; margin-top: 2px; text-shadow: none !important; }
+        .nano-price { font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.1; display: block; }
+        .nano-meta { font-size: 0.7rem; color: var(--secondary); font-weight: 600; display: block; margin-top: 2px; }
 
         .lote-badge-wrapper { width: 0; height: 0; position: absolute; pointer-events: none; overflow: visible; z-index: 100; }
         .lote-badge-content {
@@ -93,12 +109,12 @@
             border-radius: 50px; display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
             white-space: nowrap; pointer-events: auto; cursor: pointer; 
-            transition: transform 0.1s ease-out; text-shadow: none !important;
+            transition: transform 0.1s ease-out; 
         }
         .lote-badge-content:hover { transform: translate(-50%, -50%) scale(1.1); z-index: 101; border-width: 2px; }
 
         .poi-wrapper { width: 0; height: 0; position: absolute; overflow: visible; pointer-events: none; }
-        .poi-content { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; width: max-content; pointer-events: auto; cursor: pointer; transition: transform 0.2s ease-out; text-shadow: none !important; }
+        .poi-content { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; width: max-content; pointer-events: auto; cursor: pointer; transition: transform 0.2s ease-out; }
         .poi-head { z-index: 10; margin-bottom: -2px; transition: transform 0.2s ease-out; }
         .poi-pill { min-width: 80px; padding: 6px 12px; border-radius: 8px; text-align: center; color: white; font-weight: 700; font-size: 0.85rem; box-shadow: 0 3px 10px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .poi-sub { font-size: 0.7rem; font-weight: 400; opacity: 0.9; margin-top: 1px; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -111,10 +127,44 @@
         .poi-content.size-3 { transform: translateX(-50%) scale(1.1); transform-origin: bottom center; }
 
         @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* --- CORRECCIONES PARA MÓVILES (Anti-solapamiento) --- */
+        @media (max-width: 768px) {
+            .company-logo { height: 40px; top: 15px; right: 15px; }
+            .project-header { left: 15px; top: 15px; max-width: 250px; }
+            .project-card-header { padding: 12px 18px; border-radius: 12px 30px 30px 12px; }
+            .project-card-header h1 { font-size: 1.1rem; }
+            .project-desc { display: none; } 
+            .project-location { font-size: 0.7rem; }
+
+            /* Subimos la barra legal para separarla del borde inferior */
+            .legal-bar { 
+                bottom: 45px; 
+                width: 94%; 
+                left: 3%; 
+                z-index: 90;
+            }
+            .legal-pill { 
+                padding: 6px 12px; 
+                font-size: 0.6rem; 
+                max-width: 100%;
+            }
+
+            /* Ponemos el Powered By centrado abajo */
+            .powered-by { 
+                bottom: 12px; 
+                right: auto; left: 50%; 
+                transform: translateX(-50%); 
+                font-size: 0.6rem; 
+                width: 100%; text-align: center;
+                opacity: 0.6;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="viewer"></div>
+    
     <div class="project-header" id="header-container" style="display:none;">
         <div class="project-card-header">
             <h1 id="p-title">Cargando...</h1>
@@ -122,10 +172,13 @@
             <div class="project-desc" id="p-desc"></div>
         </div>
     </div>
+    
     <img id="company-logo-img" class="company-logo" style="display:none;" alt="Logo">
+    
     <div class="legal-bar">
-        <div class="legal-pill"><i class="bi bi-exclamation-triangle-fill" style="color:white; font-size: 0.9rem;"></i> Imágenes y deslindes referenciales. Sujeto a topografía final.</div>
+        <div class="legal-pill"><i class="bi bi-exclamation-triangle-fill" style="color:white; font-size: 0.9rem;"></i> Imágenes referenciales. Sujeto a topografía.</div>
     </div>
+    
     <div class="powered-by">Powered by LOTIFY</div>
 
     <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js", "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js", "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.module.js" } }</script>
@@ -133,7 +186,10 @@
         import { Viewer } from '@photo-sphere-viewer/core';
         import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 
-        // --- CONFIGURACIÓN DE URL DINÁMICA ---
+        // Detectar si es móvil para ajustar el comportamiento del click
+        const isMobile = window.matchMedia("(any-pointer: coarse)").matches;
+        
+        // URL API
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const API_URL = isLocal ? 'http://localhost:3000/api/public' : 'https://lotify-backend.onrender.com/api/public';
         
@@ -200,7 +256,6 @@
                     container: document.getElementById('viewer'),
                     panorama: project.imagen_360_url,
                     navbar: false, defaultZoomLvl: 0, mousewheel: true,
-                    // CORRECCIÓN: Eliminado touchmoveTwoFingers: true para permitir mover con un dedo
                     plugins: [[MarkersPlugin, { markers: [] }]]
                 });
                 markersPlugin = viewer.getPlugin(MarkersPlugin);
@@ -214,7 +269,6 @@
                     let puntos = rawData;
                     if(typeof puntos === 'string') { try { puntos = JSON.parse(puntos); } catch(e){ return; } }
 
-                    // --- CORRECCIÓN POI: Bloque restaurado ---
                     if (el.tipo === 'poi') {
                         const data = puntos;
                         if(!data || typeof data.yaw === 'undefined') return;
@@ -238,16 +292,34 @@
                         const strokeW = (el.color_hex && !isNaN(el.color_hex)) ? parseInt(el.color_hex) : 4;
                         const initialW = Math.max(2, strokeW * getLoteScale(0));
 
-                        markersPlugin.addMarker({ id: `poly_${el.id}`, polygonPixels: false, polygon: path.map(p => [p[0], p[1]]), svgStyle: { fill: 'rgba(255,255,255,0.0)', stroke: 'white', strokeWidth: initialW }, data: { tipo: 'lote', color_hex: strokeW } });
+                        // 1. Preparamos el tooltip (Tarjeta)
+                        const tooltipContent = createNanoCard(el, color);
+                        const tooltipConfig = { 
+                            content: tooltipContent, 
+                            position: 'top center',
+                            trigger: isMobile ? 'click' : 'hover' // IMPORTANTE: Click en móvil, Hover en PC
+                        };
 
+                        // 2. Agregamos el Polígono (CON TOOLTIP para que al tocarlo se abra la tarjeta)
+                        markersPlugin.addMarker({ 
+                            id: `poly_${el.id}`, 
+                            polygonPixels: false, 
+                            polygon: path.map(p => [p[0], p[1]]), 
+                            svgStyle: { fill: 'rgba(255,255,255,0.0)', stroke: 'white', strokeWidth: initialW }, 
+                            tooltip: tooltipConfig, // <-- Aquí está la magia para el polígono
+                            data: { tipo: 'lote', color_hex: strokeW } 
+                        });
+
+                        // 3. Agregamos el Badge (Número) (TAMBIÉN CON TOOLTIP)
                         const center = getPolygonCenter(path);
                         if(center) {
                             let badgeStyle = el.estado_id === 1 ? 'background: white; color: #1e293b; border: 2px solid white;' : `background: ${color}; border: 2px solid white; color: white;`;
                             const badgeHtml = `<div class="lote-badge-wrapper"><div class="lote-badge-content" style="${badgeStyle}">${el.numero_lote}</div></div>`;
                             markersPlugin.addMarker({ 
-                                id: `badge_${el.id}`, position: { yaw: center[0], pitch: center[1] }, 
+                                id: `badge_${el.id}`, 
+                                position: { yaw: center[0], pitch: center[1] }, 
                                 html: badgeHtml, anchor: 'center center', 
-                                tooltip: { content: createNanoCard(el, color), position: 'top center' }, 
+                                tooltip: tooltipConfig, // Badge también abre la tarjeta
                                 data: { tipo: 'badge' } 
                             });
                         }
