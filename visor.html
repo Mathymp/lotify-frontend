@@ -2,134 +2,267 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor 360 - LOTIFY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Visita Virtual - LOTIFY</title>
     <link rel="icon" type="image/png" href="fav.png.png">
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.7.3/index.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.7.3/index.min.css">
-    
-    <link rel="stylesheet" href="css/visor.css">
+    <style>
+        :root { --primary: #2563eb; --secondary: #64748b; --dark: #0f172a; }
+        body { margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+        #viewer { width: 100vw; height: 100vh; background: var(--dark); }
+
+        .company-logo { position: fixed; top: 30px; right: 30px; z-index: 100; height: 80px; width: auto; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); }
+        
+        .project-header { 
+            position: fixed; top: 30px; left: 25px; z-index: 100; max-width: 380px;
+            display: flex; justify-content: flex-start; 
+            animation: slideInLeft 0.7s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        }
+        
+        .project-card-header { 
+            background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px); 
+            padding: 18px 28px; border-radius: 16px 50px 50px 16px; 
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 5px 10px -5px rgba(0,0,0,0.05);
+            text-align: left; border: 1px solid rgba(255,255,255,0.5);
+            border-left: 4px solid var(--primary); 
+        }
+        
+        .project-card-header h1 { margin: 0; font-size: 1.4rem; font-weight: 800; color: var(--dark); line-height: 1.1; letter-spacing: -0.5px; }
+        .project-location { margin-top: 6px; font-size: 0.8rem; color: var(--secondary); font-weight: 700; display: flex; align-items: center; justify-content: flex-start; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .project-location i { color: var(--primary); font-size: 0.9rem; }
+        .project-desc { margin-top: 8px; font-size: 0.85rem; color: var(--secondary); font-weight: 500; line-height: 1.4; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; }
+
+        .legal-bar { position: fixed; bottom: 20px; width: 100%; z-index: 80; display: flex; justify-content: center; pointer-events: none; }
+        .legal-pill { background: rgba(0, 0, 0, 0.75); padding: 8px 20px; border-radius: 30px; font-size: 0.7rem; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; gap: 8px; text-align: center; max-width: 90%; }
+        .powered-by { position: fixed; bottom: 8px; right: 20px; z-index: 100; font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); font-weight: 800; pointer-events: none; text-transform: uppercase; letter-spacing: 1px; text-shadow: none; }
+
+        .psv-marker-svg, .polygon-marker { filter: none !important; box-shadow: none !important; drop-shadow: none !important; }
+        .psv-tooltip { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+        .psv-tooltip-content { background: transparent !important; padding: 0 !important; border-radius: 0 !important; }
+
+        .lote-card-nano {
+            background: white; border-radius: 12px; padding: 8px 12px;
+            text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            margin-bottom: 12px; white-space: nowrap; position: relative; text-shadow: none !important;
+        }
+        .lote-card-nano::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px 5px 0; border-style: solid; border-color: white transparent transparent transparent;
+        }
+
+        .nano-status { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; margin-bottom: 4px; color: white !important; padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); text-shadow: none !important; }
+        .nano-price { font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.1; display: block; text-shadow: none !important; }
+        .nano-meta { font-size: 0.7rem; color: var(--secondary); font-weight: 600; display: block; margin-top: 2px; text-shadow: none !important; }
+
+        .lote-badge-wrapper { width: 0; height: 0; position: absolute; pointer-events: none; overflow: visible; z-index: 100; }
+        .lote-badge-content {
+            position: absolute; top: 0; left: 0; transform: translate(-50%, -50%);
+            min-width: 28px; height: 28px; padding: 0 5px;
+            border-radius: 50px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
+            white-space: nowrap; pointer-events: auto; cursor: pointer; 
+            transition: transform 0.1s ease-out; text-shadow: none !important;
+        }
+        .lote-badge-content:hover { transform: translate(-50%, -50%) scale(1.1); z-index: 101; border-width: 2px; }
+
+        .poi-wrapper { width: 0; height: 0; position: absolute; overflow: visible; pointer-events: none; }
+        .poi-content { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; width: max-content; pointer-events: auto; cursor: pointer; transition: transform 0.2s ease-out; text-shadow: none !important; }
+        .poi-head { z-index: 10; margin-bottom: -2px; transition: transform 0.2s ease-out; }
+        .poi-pill { min-width: 80px; padding: 6px 12px; border-radius: 8px; text-align: center; color: white; font-weight: 700; font-size: 0.85rem; box-shadow: 0 3px 10px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .poi-sub { font-size: 0.7rem; font-weight: 400; opacity: 0.9; margin-top: 1px; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .poi-line { width: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1; margin-bottom: -4px; }
+        .poi-anchor { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 2; }
+        .poi-content.right .poi-head { transform: translateX(25px); }
+        .poi-content.left .poi-head { transform: translateX(-25px); }
+        .poi-content.size-1 { transform: translateX(-50%) scale(0.7); transform-origin: bottom center; }
+        .poi-content.size-2 { transform: translateX(-50%) scale(0.9); transform-origin: bottom center; }
+        .poi-content.size-3 { transform: translateX(-50%) scale(1.1); transform-origin: bottom center; }
+
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* --- MEDIA QUERIES PARA CELULAR --- */
+        @media (max-width: 768px) {
+            .company-logo { height: 40px; top: 15px; right: 15px; }
+            .project-header { top: 15px; left: 15px; max-width: 75%; }
+            .project-card-header { padding: 12px 18px; border-radius: 12px 25px 25px 12px; }
+            .project-card-header h1 { font-size: 1.1rem; }
+            .project-location { font-size: 0.7rem; }
+            .project-desc { display: none; } 
+            .legal-pill { font-size: 0.6rem; padding: 6px 12px; width: 90%; text-align: center; line-height: 1.2; }
+            .powered-by { font-size: 0.6rem; bottom: 5px; right: 10px; opacity: 0.6; }
+        }
+    </style>
 </head>
 <body>
-
     <div id="viewer"></div>
-
-    <div class="top-capsule">
-        <a href="dashboard.html" class="back-circle"><i class="bi bi-arrow-left"></i></a>
-        <span class="project-title" id="project-title">Cargando...</span>
-    </div>
-
-    <div class="toolbar">
-        <div class="toolbar-title">HERRAMIENTAS</div>
-        <button class="tool-btn" id="btn-lote" onclick="setMode('lote')"><i class="bi bi-bounding-box"></i> <span>Dibujar Lote</span></button>
-        <div class="settings-panel" id="lote-settings">
-            <div class="control-row"><span class="control-label">Grosor</span><input type="range" id="lote-width" min="1" max="10" value="4" oninput="updateSettings('lote')"><span class="val-display" id="disp-lote-width">4</span></div>
+    <div class="project-header" id="header-container" style="display:none;">
+        <div class="project-card-header">
+            <h1 id="p-title">Cargando...</h1>
+            <div class="project-location" id="p-location-container" style="display:none;"><i class="bi bi-geo-alt-fill"></i> <span id="p-location"></span></div>
+            <div class="project-desc" id="p-desc"></div>
         </div>
+    </div>
+    <img id="company-logo-img" class="company-logo" style="display:none;" alt="Logo">
+    <div class="legal-bar">
+        <div class="legal-pill"><i class="bi bi-exclamation-triangle-fill" style="color:white; font-size: 0.9rem; margin-right: 5px;"></i> Imágenes referenciales. Sujeto a topografía.</div>
+    </div>
+    <div class="powered-by">Powered by LOTIFY</div>
+
+    <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js", "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js", "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.module.js" } }</script>
+    <script type="module">
+        import { Viewer } from '@photo-sphere-viewer/core';
+        import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
+        // =================================================================================
+        // CONEXIÓN CONFIGURADA CON RENDER
+        // =================================================================================
         
-        <button class="tool-btn" id="btn-camino" onclick="setMode('camino')"><i class="bi bi-bezier2"></i> <span>Dibujar Camino</span></button>
-        <div class="settings-panel" id="camino-settings">
-            <div class="control-row"><span class="control-label">Ancho</span><input type="range" id="camino-width" min="2" max="60" value="15" oninput="updateSettings('camino')"><span class="val-display" id="disp-camino-width">15</span></div>
-            <div class="control-row compact"><span class="control-label">Color</span><input type="color" id="camino-color" class="color-input" value="#ffffff" oninput="updateSettings('camino')"></div>
-            <div class="control-row"><span class="control-label">Punta</span><button class="cap-btn active" id="btn-cap-round" onclick="setLineCap('round')" title="Redondeada"><i class="bi bi-circle-fill" style="font-size: 0.6rem;"></i></button><button class="cap-btn" id="btn-cap-square" onclick="setLineCap('square')" title="Cuadrada"><i class="bi bi-square-fill" style="font-size: 0.6rem;"></i></button></div>
-        </div>
+        const API_URL = 'https://lotify-backend.onrender.com/api/public';
         
-        <button class="tool-btn" id="btn-poi" onclick="setMode('poi')"><i class="bi bi-geo-alt-fill"></i> <span>Punto Interés</span></button>
-        <div class="settings-panel" id="poi-settings">
-            <div class="control-row"><span class="control-label">Altura</span><input type="range" id="poi-height" min="10" max="300" value="100" oninput="updateSettings('poi')"><span class="val-display" id="disp-poi-height">100</span></div>
-        </div>
-        
-        <div style="height:1px; background:#f1f5f9; margin:4px 0;"></div>
-        <button class="tool-btn delete-tool" id="btn-delete-tool" onclick="setMode('delete')"><i class="bi bi-trash"></i> <span>Eliminar</span></button>
-        </div>
+        // =================================================================================
 
-    <div class="floating-legend" id="undo-legend">
-        <i class="bi bi-arrow-counterclockwise"></i> Deshacer: <span class="key-badge">Ctrl</span> + <span class="key-badge">Z</span>
-    </div>
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('s'); 
+        const TEXTS = { 1: 'DISPONIBLE', 2: 'RESERVADO', 3: 'VENDIDO' };
+        let viewer, markersPlugin;
 
-    <div class="status-bar" id="status-bar">
-        <button class="btn-cancel-draw" onclick="cancelDrawing()">Cancelar</button>
-        <span id="status-text">Dibujando...</span>
-        <button class="btn-finish" onclick="finishDrawing()">FINALIZAR</button>
-    </div>
+        // Ajuste de escala para caminos en movil
+        const getCaminoScale = (zoom) => {
+            const isMobile = window.innerWidth < 768;
+            return (isMobile ? 0.5 : 0.3) + (0.5 * (zoom / 100)); 
+        };
+        const getLoteScale = (zoom) => 0.6 + (0.4 * (zoom / 100));
 
-    <div class="modal-overlay" id="modal-lote">
-        <div class="modal-box">
-            <h3>Datos del Lote</h3>
-            <div id="lote-alert" class="alert alert-danger" style="display:none; padding:10px; margin-bottom:10px; background:#fee2e2; color:#ef4444; border-radius:8px; font-size:0.85rem;"></div>
-            <div style="display:flex; gap:10px;">
-                <div class="input-group" style="flex:1;"><label>Número</label><input type="text" class="styled-input" id="input-numero" placeholder="Ej. 10 o 1-A"></div>
-                <div class="input-group" style="flex:1.5;"><label>Estado</label><select class="styled-input" id="input-estado"><option value="1">🟢 Disponible</option><option value="2">🔵 Reservado</option><option value="3">🔴 Vendido</option></select></div>
-            </div>
-            <div class="input-group"><label>Precio ($)</label><input type="text" class="styled-input" id="input-precio" oninput="formatNumber(this)"></div>
-            <div class="input-group"><label>Superficie (m²)</label><input type="text" class="styled-input" id="input-superficie" oninput="formatNumber(this)"></div>
-            <div class="modal-footer"><button class="btn-delete" id="btn-lote-delete" style="display:none;" onclick="confirmDelete()"><i class="bi bi-trash"></i></button><button class="btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn-save" onclick="saveData()">Guardar</button></div>
-        </div>
-    </div>
-
-    <div id="poi-editor-panel">
-        <h3><i class="bi bi-pencil-square" style="color:#2563eb;"></i> Editar Punto</h3>
-        <div class="input-group"><label>Título</label><input type="text" class="styled-input" id="input-poi-titulo" oninput="updateActivePoi()"></div>
-        <div class="input-group"><label>Descripción</label><input type="text" class="styled-input" id="input-poi-desc" oninput="updateActivePoi()"></div>
-        
-        <div class="poi-controls-box">
-            <div class="poi-stacked-control">
-                <span>Tamaño</span>
-                <div class="segmented-control">
-                    <button class="segment-btn" onclick="setPoiSize(1, this)">S</button>
-                    <button class="segment-btn active" onclick="setPoiSize(2, this)">M</button>
-                    <button class="segment-btn" onclick="setPoiSize(3, this)">L</button>
-                </div>
-            </div>
-            
-            <div class="poi-stacked-control">
-                <span>Orientación</span>
-                <div class="segmented-control">
-                    <button class="segment-btn" id="btn-orient-left" onclick="setPoiOrient('left')"><i class="bi bi-text-left"></i> Izq</button>
-                    <button class="segment-btn active" id="btn-orient-right" onclick="setPoiOrient('right')">Der <i class="bi bi-text-right"></i></button>
-                </div>
-            </div>
-
-            <div class="poi-color-row" style="margin-top: 5px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:0.75rem; color:#64748b; font-weight:700;">Fondo</span>
-                    <input type="color" id="input-poi-bg" value="#ef4444" class="color-input" oninput="updateActivePoi()">
-                </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:0.75rem; color:#64748b; font-weight:700;">Texto</span>
-                    <input type="color" id="input-poi-text" value="#ffffff" class="color-input" oninput="updateActivePoi()">
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-footer" style="background:transparent; border:none; padding:0; margin-top:10px;"><button class="btn-delete" id="btn-poi-delete" style="display:none;" onclick="confirmDelete()"><i class="bi bi-trash"></i></button><button class="btn-cancel" onclick="closeModal()">Cerrar</button><button class="btn-save" onclick="savePoi()">Guardar</button></div>
-    </div>
-
-    <div class="modal-overlay" id="dialog-overlay">
-        <div class="modal-box">
-            <div class="dialog-content">
-                <i class="bi bi-exclamation-triangle-fill dialog-icon"></i>
-                <div class="dialog-title">¿Estás seguro?</div>
-                <p id="dialog-message" class="dialog-text"></p>
-                <div class="dialog-buttons" id="dialog-buttons"></div>
-            </div>
-        </div>
-    </div>
-
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js",
-            "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.7.3/index.module.js",
-            "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.7.3/index.module.js"
+        function getPolygonCenter(points) {
+            if (!points || points.length === 0) return null;
+            let x = 0, y = 0, z = 0;
+            points.forEach(p => {
+                const yaw = p[0]; const pitch = p[1];
+                x += Math.cos(pitch) * Math.cos(yaw);
+                y += Math.sin(pitch);
+                z += Math.cos(pitch) * Math.sin(yaw);
+            });
+            const len = points.length; x /= len; y /= len; z /= len;
+            return [Math.atan2(z, x), Math.atan2(y, Math.sqrt(x * x + z * z))];
         }
-    }
-    </script>
 
-    <script src="js/api.js"></script>
-    <script type="module" src="js/visor-logic.js"></script>
+        function updateAllMarkersScale() {
+            if (!viewer || !markersPlugin) return;
+            const currentZoom = viewer.getZoomLevel();
+            const markers = markersPlugin.markers;
+            for (const id in markers) {
+                const m = markers[id];
+                if (m.data) {
+                    if (m.data.tipo === 'camino') {
+                        const baseW = parseInt(m.data.superficie) || 15;
+                        const w = Math.max(3, baseW * getCaminoScale(currentZoom));
+                        markersPlugin.updateMarker({ id: id, svgStyle: { strokeWidth: w, strokeLinecap: 'round' } });
+                    } else if (m.data.tipo === 'lote') {
+                        const baseW = parseInt(m.data.color_hex) || 4;
+                        const scaledW = Math.max(2, baseW * getLoteScale(currentZoom));
+                        markersPlugin.updateMarker({ id: id, svgStyle: { strokeWidth: scaledW } });
+                    } else if (m.data.tipo === 'badge') {
+                        const textScale = 0.7 + (0.3 * (currentZoom / 100)); 
+                        const el = document.querySelector(`#psv-marker-${id} .lote-badge-content`);
+                        if(el) el.style.transform = `translate(-50%, -50%) scale(${textScale})`;
+                    }
+                }
+            }
+        }
+
+        async function init() {
+            if(!slug) return alert('Proyecto no especificado');
+            try {
+                const pRes = await fetch(`${API_URL}/project/${slug}`);
+                if(!pRes.ok) throw new Error('Error de red o proyecto no encontrado');
+                const project = await pRes.json();
+
+                document.getElementById('p-title').innerText = project.nombre;
+                if(project.localidad) { document.getElementById('p-location').innerText = project.localidad; document.getElementById('p-location-container').style.display = 'flex'; }
+                if(project.descripcion) document.getElementById('p-desc').innerText = project.descripcion;
+                document.getElementById('header-container').style.display = 'flex';
+                document.title = `${project.nombre} | Visita Virtual`;
+                if (project.logo_url) { const logoImg = document.getElementById('company-logo-img'); logoImg.src = project.logo_url; logoImg.style.display = 'block'; }
+
+                viewer = new Viewer({
+                    container: document.getElementById('viewer'),
+                    panorama: project.imagen_360_url,
+                    navbar: false, defaultZoomLvl: 0, mousewheel: true,
+                    touchmoveTwoFingers: true, 
+                    plugins: [[MarkersPlugin, { markers: [] }]]
+                });
+                markersPlugin = viewer.getPlugin(MarkersPlugin);
+                viewer.addEventListener('zoom-updated', updateAllMarkersScale);
+
+                const lRes = await fetch(`${API_URL}/lotes/${project.id}`);
+                const elements = await lRes.json();
+
+                elements.forEach(el => {
+                    let rawData = el.poligono_json || el.coordenadas_json;
+                    let puntos = rawData;
+                    if(typeof puntos === 'string') { try { puntos = JSON.parse(puntos); } catch(e){ return; } }
+
+                    if (el.tipo === 'poi') {
+                        const data = puntos;
+                        if(!data || typeof data.yaw === 'undefined') return;
+                        const h = data.height || 100; const bg = data.bg || '#ef4444'; const txt = data.text || '#ffffff';
+                        const sizeClass = data.size || 2; const orient = data.orient || 'right';
+                        const descHtml = el.descripcion ? `<span class="poi-sub" style="color:${txt}CC">${el.descripcion}</span>` : '';
+                        const html = `<div class="poi-wrapper"><div class="poi-content ${orient} size-${sizeClass}"><div class="poi-head"><div class="poi-pill" style="background:${bg}; color:${txt};"><div style="line-height:1.2">${el.titulo}</div>${descHtml}</div></div><div class="poi-line" style="height: ${h}px; background:${bg};"></div><div class="poi-anchor" style="background:${bg};"></div></div></div>`;
+                        markersPlugin.addMarker({ id: `poi_${el.id}`, position: { yaw: data.yaw, pitch: data.pitch }, html: html, anchor: 'center center', data: { tipo: 'poi' } });
+                    } 
+                    else if (el.tipo === 'camino') {
+                        const path = Array.isArray(puntos) ? puntos : (puntos && puntos.path ? puntos.path : []);
+                        if(path.length < 2) return;
+                        const baseW = parseInt(el.superficie) || 15;
+                        const initialW = Math.max(3, baseW * getCaminoScale(0));
+                        markersPlugin.addMarker({ id: `camino_${el.id}`, polyline: path.map(p => [p[0], p[1]]), svgStyle: { stroke: el.color_hex || '#ffffff', strokeWidth: initialW, strokeLinecap: 'round', strokeOpacity: 0.8 }, data: { tipo: 'camino', superficie: baseW, color_hex: el.color_hex } });
+                    }
+                    else if(el.tipo === 'lote') {
+                        const path = Array.isArray(puntos) ? puntos : (puntos && puntos.path ? puntos.path : []);
+                        if(path.length < 2) return;
+                        let color = '#10b981'; if(el.estado_id === 2) color = '#2563eb'; if(el.estado_id === 3) color = '#ef4444'; 
+                        const strokeW = (el.color_hex && !isNaN(el.color_hex)) ? parseInt(el.color_hex) : 4;
+                        const initialW = Math.max(2, strokeW * getLoteScale(0));
+
+                        markersPlugin.addMarker({ id: `poly_${el.id}`, polygonPixels: false, polygon: path.map(p => [p[0], p[1]]), svgStyle: { fill: 'rgba(255,255,255,0.0)', stroke: 'white', strokeWidth: initialW }, data: { tipo: 'lote', color_hex: strokeW } });
+
+                        const center = getPolygonCenter(path);
+                        if(center) {
+                            let badgeStyle = el.estado_id === 1 ? 'background: white; color: #1e293b; border: 2px solid white;' : `background: ${color}; border: 2px solid white; color: white;`;
+                            const badgeHtml = `<div class="lote-badge-wrapper"><div class="lote-badge-content" style="${badgeStyle}">${el.numero_lote}</div></div>`;
+                            markersPlugin.addMarker({ 
+                                id: `badge_${el.id}`, position: { yaw: center[0], pitch: center[1] }, 
+                                html: badgeHtml, anchor: 'center center', 
+                                tooltip: { content: createNanoCard(el, color), position: 'top center' }, 
+                                data: { tipo: 'badge' } 
+                            });
+                        }
+                    } 
+                });
+                updateAllMarkersScale();
+            } catch (error) { console.error(error); alert('Error al cargar datos. Verifique la conexión.'); }
+        }
+
+        function createNanoCard(el, color) {
+            const precio = parseInt(el.precio || 0).toLocaleString('es-CL');
+            const sup = parseInt(el.superficie || 0).toLocaleString('es-CL');
+            return `
+                <div class="lote-card-nano">
+                    <span class="nano-status" style="background:${color};">${TEXTS[el.estado_id]}</span>
+                    <span class="nano-price">$${precio}</span>
+                    <span class="nano-meta">${sup} m²</span>
+                </div>
+            `;
+        }
+        init();
+    </script>
 </body>
 </html>
