@@ -1,26 +1,34 @@
-// =========================================================================
-// ⚠️ 1. URL PÚBLICA DE TU API (Backend)
-// =========================================================================
-const API_URL = 'https://lotify-backend.onrender.com/api'; // <--- ESTA ES LA URL CORRECTA
-// =========================================================================
+// js/api.js
+
+// Configuración automática de la URL de la API
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// URL de producción (Render) vs URL local
+const API_URL = isLocal ? 'http://localhost:3000/api' : 'https://lotify-backend.onrender.com/api';
+
+console.log(`🌍 Conectando a la API en: ${API_URL}`);
 
 const getToken = () => localStorage.getItem('userToken');
 
-/**
- * Función para manejar respuestas de Fetch API.
- */
 async function handleResponse(res) {
   let data = {};
+  
   try {
-      const resClone = res.clone();
+      const resClone = res.clone(); 
       const text = await resClone.text();
-      if (text.length > 0) { data = JSON.parse(text); }
-  } catch (e) { /* No body */ }
+      if (text.length > 0) {
+          data = JSON.parse(text);
+      }
+  } catch (e) {
+     console.warn("No se pudo parsear la respuesta JSON", e);
+  }
 
   if (!res.ok) {
       if (res.status === 401) {
-          if (data.message) { throw new Error(data.message); }
+          if (data.message) {
+              throw new Error(data.message);
+          }
           localStorage.removeItem('userToken');
+          
           if (window.location.pathname.indexOf('index.html') === -1) {
               alert("⚠️ Sesión expirada. Por favor ingresa nuevamente.");
               window.location.href = 'index.html';
@@ -35,29 +43,26 @@ async function handleResponse(res) {
   return data;
 }
 
-/**
- * Wrapper de fetch para manejar errores de red.
- */
 const safeFetch = async (url, options = {}) => {
     try {
         const res = await fetch(url, options);
         return await handleResponse(res);
     } catch (e) {
         if (e.message.includes('Failed to fetch')) {
-            throw new Error("❌ Error de conexión: El servidor no responde. Revisa si el backend está encendido y la URL es correcta.");
+            throw new Error("❌ Error de conexión: El servidor no responde. Revisa si el backend está encendido.");
         }
         throw e;
     }
 }
 
-
-// --- FUNCIONES DE AUTENTICACIÓN ---
+// --- Funciones de Autenticación ---
 
 async function registerUser(nombre_usuario, email, password) {
   const data = await safeFetch(`${API_URL}/auth/register`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nombre_usuario, email, password })
   });
+  
   if (!data.token) throw new Error('Error: El servidor no devolvió un token válido.');
   return data;
 }
@@ -67,19 +72,17 @@ async function loginUser(email, password) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
+  
   if (!data.token) throw new Error('Error: El servidor no devolvió un token válido.');
   return data;
 }
 
-// NUEVA FUNCIÓN NECESARIA POR DASHBOARD.HTML
-async function getMe() {
-  return await safeFetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
-}
-
-// --- FUNCIONES DE PROYECTOS ---
+// --- Funciones de Proyectos ---
 
 async function getProjects() {
-  return await safeFetch(`${API_URL}/projects`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+  return await safeFetch(`${API_URL}/projects`, {
+    headers: { 'Authorization': `Bearer ${getToken()}` }
+  });
 }
 
 async function createProject(formData) {
@@ -92,7 +95,7 @@ async function createProject(formData) {
 
 async function updateProject(id, formData) {
     const res = await fetch(`${API_URL}/projects/${id}`, {
-        method: 'PUT',
+        method: 'PUT', 
         headers: { 'Authorization': `Bearer ${getToken()}` },
         body: formData
     });
@@ -100,7 +103,9 @@ async function updateProject(id, formData) {
 }
 
 async function getProjectById(id) {
-  return await safeFetch(`${API_URL}/projects/${id}`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+  return await safeFetch(`${API_URL}/projects/${id}`, {
+    headers: { 'Authorization': `Bearer ${getToken()}` }
+  });
 }
 
 async function deleteProject(id) {
@@ -108,10 +113,11 @@ async function deleteProject(id) {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${getToken()}` }
   });
+  
   if (!res.ok) await handleResponse(res);
 }
 
-// --- FUNCIONES DE LOTES ---
+// --- Funciones de Lotes ---
 
 async function saveLote(loteData) {
     const res = await fetch(`${API_URL}/lotes`, {
@@ -123,7 +129,9 @@ async function saveLote(loteData) {
 }
 
 async function getLotes(projectId) {
-    return await safeFetch(`${API_URL}/lotes/${projectId}`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+    return await safeFetch(`${API_URL}/lotes/${projectId}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
 }
 
 async function updateLote(id, loteData) {
