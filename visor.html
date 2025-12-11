@@ -14,6 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     
     <style>
+        /* --- TU DISEÑO ORIGINAL EXACTO --- */
         :root { --primary: #2563eb; --secondary: #64748b; --dark: #0f172a; }
         body { margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
         #viewer { width: 100vw; height: 100vh; background: var(--dark); }
@@ -21,26 +22,45 @@
         .company-logo { position: fixed; top: 30px; right: 30px; z-index: 100; height: 80px; width: auto; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); }
         
         .project-header { 
-            position: fixed; top: 30px; left: 25px; z-index: 100; max-width: 380px;
+            position: fixed; top: 30px; 
+            left: 25px; 
+            z-index: 100; 
+            max-width: 380px;
             display: flex; justify-content: flex-start; 
             animation: slideInLeft 0.7s cubic-bezier(0.25, 0.8, 0.25, 1); 
         }
         
         .project-card-header { 
-            background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px); 
-            padding: 18px 28px; border-radius: 16px 50px 50px 16px; 
+            background: rgba(255, 255, 255, 0.88); 
+            backdrop-filter: blur(12px); 
+            padding: 18px 28px;
+            
+            border-radius: 16px 50px 50px 16px; 
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 5px 10px -5px rgba(0,0,0,0.05);
-            text-align: left; border: 1px solid rgba(255,255,255,0.5);
+            text-align: left; 
+            border: 1px solid rgba(255,255,255,0.5);
             border-left: 4px solid var(--primary); 
         }
         
-        .project-card-header h1 { margin: 0; font-size: 1.4rem; font-weight: 800; color: var(--dark); line-height: 1.1; letter-spacing: -0.5px; }
-        .project-location { margin-top: 6px; font-size: 0.8rem; color: var(--secondary); font-weight: 700; display: flex; align-items: center; justify-content: flex-start; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .project-card-header h1 { 
+            margin: 0; font-size: 1.4rem;
+            font-weight: 800; color: var(--dark); line-height: 1.1; letter-spacing: -0.5px;
+        }
+        
+        .project-location { 
+            margin-top: 6px; font-size: 0.8rem; color: var(--secondary); font-weight: 700; 
+            display: flex; align-items: center; justify-content: flex-start; 
+            gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
         .project-location i { color: var(--primary); font-size: 0.9rem; }
-        .project-desc { margin-top: 8px; font-size: 0.85rem; color: var(--secondary); font-weight: 500; line-height: 1.4; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; }
+        
+        .project-desc { 
+            margin-top: 8px; font-size: 0.85rem; color: var(--secondary); 
+            font-weight: 500; line-height: 1.4; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;
+        }
 
         .legal-bar { position: fixed; bottom: 20px; width: 100%; z-index: 80; display: flex; justify-content: center; pointer-events: none; }
-        .legal-pill { background: rgba(0, 0, 0, 0.75); padding: 8px 20px; border-radius: 30px; font-size: 0.7rem; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; gap: 8px; text-align: center; max-width: 90%; }
+        .legal-pill { background: rgba(0, 0, 0, 0.75); padding: 8px 20px; border-radius: 30px; font-size: 0.7rem; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; gap: 8px; text-align: center; }
         .powered-by { position: fixed; bottom: 8px; right: 20px; z-index: 100; font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); font-weight: 800; pointer-events: none; text-transform: uppercase; letter-spacing: 1px; text-shadow: none; }
 
         .psv-marker-svg, .polygon-marker { filter: none !important; box-shadow: none !important; drop-shadow: none !important; }
@@ -57,7 +77,13 @@
             border-width: 5px 5px 0; border-style: solid; border-color: white transparent transparent transparent;
         }
 
-        .nano-status { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; margin-bottom: 4px; color: white !important; padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); text-shadow: none !important; }
+        .nano-status { 
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; 
+            display: inline-block; margin-bottom: 4px; color: white !important; 
+            padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            text-shadow: none !important;
+        }
+
         .nano-price { font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.1; display: block; text-shadow: none !important; }
         .nano-meta { font-size: 0.7rem; color: var(--secondary); font-weight: 600; display: block; margin-top: 2px; text-shadow: none !important; }
 
@@ -87,16 +113,47 @@
 
         @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* --- MEDIA QUERIES PARA CELULAR --- */
+        /* --- AJUSTES MÓVILES SIN CAMBIAR TU DISEÑO --- */
         @media (max-width: 768px) {
-            .company-logo { height: 40px; top: 15px; right: 15px; }
-            .project-header { top: 15px; left: 15px; max-width: 75%; }
-            .project-card-header { padding: 12px 18px; border-radius: 12px 25px 25px 12px; }
-            .project-card-header h1 { font-size: 1.1rem; }
-            .project-location { font-size: 0.7rem; }
-            .project-desc { display: none; } 
-            .legal-pill { font-size: 0.6rem; padding: 6px 12px; width: 90%; text-align: center; line-height: 1.2; }
-            .powered-by { font-size: 0.6rem; bottom: 5px; right: 10px; opacity: 0.6; }
+            /* Hacemos el logo un poco más pequeño para que no compita */
+            .company-logo {
+                height: 50px;
+                top: 20px;
+                right: 20px;
+            }
+
+            /* Ajustamos el letrero principal para que quepa bien */
+            .project-header {
+                top: 20px;
+                left: 20px;
+                max-width: 65%; /* Evita chocar con el logo */
+            }
+
+            /* Reducimos un poco el padding interno pero mantenemos tus curvas */
+            .project-card-header {
+                padding: 14px 20px; 
+            }
+
+            /* Fuente un poco más chica para móvil */
+            .project-card-header h1 {
+                font-size: 1rem; 
+            }
+            .project-location {
+                font-size: 0.7rem;
+            }
+
+            /* Ocultamos la descripción larga en móvil para que no tape la vista */
+            .project-desc {
+                display: none;
+            }
+
+            /* Ajuste barra legal */
+            .legal-pill {
+                width: 90%;
+                font-size: 0.6rem;
+                padding: 6px 12px;
+                line-height: 1.2;
+            }
         }
     </style>
 </head>
@@ -120,24 +177,17 @@
         import { Viewer } from '@photo-sphere-viewer/core';
         import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 
-        // =================================================================================
-        // CONEXIÓN CONFIGURADA CON RENDER
-        // =================================================================================
-        
+        // ==========================================
+        // LINK CORRECTO DE RENDER
+        // ==========================================
         const API_URL = 'https://lotify-backend.onrender.com/api/public';
         
-        // =================================================================================
-
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('s'); 
         const TEXTS = { 1: 'DISPONIBLE', 2: 'RESERVADO', 3: 'VENDIDO' };
         let viewer, markersPlugin;
 
-        // Ajuste de escala para caminos en movil
-        const getCaminoScale = (zoom) => {
-            const isMobile = window.innerWidth < 768;
-            return (isMobile ? 0.5 : 0.3) + (0.5 * (zoom / 100)); 
-        };
+        const getCaminoScale = (zoom) => 0.3 + (0.5 * (zoom / 100)); 
         const getLoteScale = (zoom) => 0.6 + (0.4 * (zoom / 100));
 
         function getPolygonCenter(points) {
@@ -181,7 +231,7 @@
             if(!slug) return alert('Proyecto no especificado');
             try {
                 const pRes = await fetch(`${API_URL}/project/${slug}`);
-                if(!pRes.ok) throw new Error('Error de red o proyecto no encontrado');
+                if(!pRes.ok) throw new Error('Proyecto no encontrado');
                 const project = await pRes.json();
 
                 document.getElementById('p-title').innerText = project.nombre;
@@ -195,7 +245,8 @@
                     container: document.getElementById('viewer'),
                     panorama: project.imagen_360_url,
                     navbar: false, defaultZoomLvl: 0, mousewheel: true,
-                    touchmoveTwoFingers: true, 
+                    // AQUÍ ESTÁ EL CAMBIO PARA PERMITIR MOVER CON 1 DEDO:
+                    touchmoveTwoFingers: false, 
                     plugins: [[MarkersPlugin, { markers: [] }]]
                 });
                 markersPlugin = viewer.getPlugin(MarkersPlugin);
@@ -248,7 +299,7 @@
                     } 
                 });
                 updateAllMarkersScale();
-            } catch (error) { console.error(error); alert('Error al cargar datos. Verifique la conexión.'); }
+            } catch (error) { console.error(error); alert('Error al cargar proyecto: ' + error.message); }
         }
 
         function createNanoCard(el, color) {
