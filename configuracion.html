@@ -79,14 +79,13 @@
 
     <script src="js/api.js"></script>
     <script>
-        const API_URL = 'https://lotify-backend.onrender.com/api'; // Inyección de URL de Render
         const token = localStorage.getItem('userToken');
         if(!token) window.location.href = 'index.html';
 
         // 1. Cargar Datos
         async function loadData() {
             try {
-                // FIX: Reemplazar fetch local por fetch a API_URL
+                // URL dinámica usando API_URL
                 const res = await fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const user = await res.json();
                 
@@ -130,17 +129,14 @@
                 const formData = new FormData();
                 formData.append('logo', input.files[0]);
 
-                // FIX: Reemplazar fetch local por fetch a API_URL
+                // URL dinámica usando API_URL
                 const res = await fetch(`${API_URL}/auth/logo`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
 
-                if(!res.ok) {
-                    const json = await res.json();
-                    throw new Error(json.message || 'Error al subir el logo');
-                }
+                if(!res.ok) throw new Error('Error al subir');
                 
                 btn.innerHTML = '¡Guardado!';
                 btn.style.background = '#10b981';

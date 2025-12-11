@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/style.css">
     
     <style>
-        /* --- ESTILOS PROFESIONALES (Rediseño Verde) --- */
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #ffffff;
@@ -23,13 +23,12 @@
             margin: 0;
         }
 
-        /* 1. NAVBAR BLANCO PRO */
         .navbar-landing {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             padding: 0 5%;
             display: flex; justify-content: space-between; align-items: center;
             background-color: #ffffff;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Sombra suave */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
             height: 80px;
         }
 
@@ -44,23 +43,22 @@
         .nav-item { text-decoration: none; color: #64748b; font-weight: 600; font-size: 0.95rem; transition: 0.2s; cursor: pointer; }
         .nav-item:hover { color: #2563eb; }
 
-        /* 2. HERO SECTION VIBRANTE */
+       
         .hero-section {
             position: relative;
             min-height: 100vh;
             display: flex; align-items: center;
             padding: 80px 5% 0 5%;
-            /* FOTO NUEVA: Campo verde intenso vista dron */
             background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2940&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* Efecto Parallax */
+            background-attachment: fixed; 
         }
 
-        /* Overlay oscuro para resaltar el verde y el texto blanco */
+        
         .hero-section::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* Degradado de negro a transparente para que el texto se lea perfecto */
+            
             background: linear-gradient(to right, rgba(0, 20, 10, 0.85) 0%, rgba(0, 40, 20, 0.4) 100%);
             z-index: 1;
         }
@@ -69,15 +67,15 @@
             max-width: 650px;
             position: relative;
             z-index: 2;
-            color: white; /* Texto blanco sobre fondo oscuro */
+            color: white; 
             animation: fadeUp 1s ease-out;
         }
 
         .hero-badge {
-            background: rgba(255, 255, 255, 0.15); /* Glassmorphism */
+            background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #4ade80; /* Verde brillante neon */
+            color: #4ade80; 
             padding: 8px 16px; border-radius: 50px;
             display: inline-flex; align-items: center; gap: 8px;
             font-size: 0.85rem; font-weight: 700; margin-bottom: 25px;
@@ -90,10 +88,10 @@
         }
         .hero-content p {
             font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px;
-            color: #e2e8f0; font-weight: 400; /* Gris muy claro */
+            color: #e2e8f0; font-weight: 400; 
         }
 
-        /* Botones Mejorados */
+       
         .btn-xl {
             padding: 16px 36px; font-size: 1.05rem; border-radius: 12px;
             font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
@@ -121,12 +119,12 @@
             border-color: white; 
         }
 
-        /* Animaciones */
+        
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .animate-delay-1 { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; animation-name: fadeUp; animation-duration: 0.8s; }
         .animate-delay-2 { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; animation-name: fadeUp; animation-duration: 0.8s; }
 
-        /* SECCIONES */
+        
         .section-padding { padding: 100px 5%; }
         .section-header { text-align: center; max-width: 700px; margin: 0 auto 60px auto; }
         .section-header h2 { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin-bottom: 15px; }
@@ -137,16 +135,16 @@
             border: 1px solid #f1f5f9; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
             transition: 0.3s;
         }
-        /* Hover verde para seguir la temática */
+        
         .feature-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px -10px rgba(16, 185, 129, 0.15); border-color: #10b981; }
         
         .icon-box {
-            width: 55px; height: 55px; background: #ecfdf5; color: #10b981; /* Verde */
+            width: 55px; height: 55px; background: #ecfdf5; color: #10b981; 
             border-radius: 14px; display: flex; align-items: center; justify-content: center;
             font-size: 1.6rem; margin-bottom: 25px;
         }
 
-        /* MODAL Y FORMULARIOS */
+      
         .auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px);
@@ -168,7 +166,7 @@
         }
         .close-modal:hover { color: #ef4444; }
 
-        /* INPUTS MEJORADOS */
+        
         .input-group { margin-bottom: 1.5rem; text-align: left; }
         .input-group label { 
             display: block; margin-bottom: 0.6rem; font-weight: 600; 
@@ -179,13 +177,13 @@
             position: relative; width: 100%;
         }
         
-        /* Icono Izquierdo (Fijo) */
+        
         .input-wrapper .input-icon {
             position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
             color: #94a3b8; font-size: 1.2rem; z-index: 10; pointer-events: none;
         }
 
-        /* Icono Derecho (Ojo Password - Clickable) */
+        
         .toggle-password-icon {
             position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
             color: #94a3b8; font-size: 1.2rem; z-index: 10; cursor: pointer;
@@ -193,10 +191,10 @@
         }
         .toggle-password-icon:hover { color: #2563eb; }
 
-        /* Campo de Texto Estilizado */
+       
         .styled-input {
             width: 100%;
-            padding: 14px 45px 14px 50px !important; /* Espacio para iconos izq/der */
+            padding: 14px 45px 14px 50px !important; 
             border: 1px solid #e2e8f0; border-radius: 12px;
             font-size: 1rem; color: #1e293b; font-family: inherit;
             background: #f8fafc; transition: all 0.2s ease;
@@ -388,12 +386,8 @@
 
     <script src="js/api.js"></script>
     <script>
-        // --- LOGICA UI & AUTH ---
-        
-        // Scroll Navbar
         const navbar = document.querySelector('.navbar-landing');
-        // No necesitamos efecto scroll en el navbar blanco fijo, 
-        // pero podemos agregar una sombra extra si se scrollea
+       
         window.addEventListener('scroll', () => {
             if (window.scrollY > 10) navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)";
             else navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05)";
@@ -404,22 +398,17 @@
             if (section) section.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Lógica Modal
         const modal = document.getElementById('auth-modal');
         const form = document.getElementById('auth-form');
         const alertBox = document.getElementById('auth-alert');
         let isLoginMode = true;
 
-        // Lógica del OJO (Ver Contraseña)
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
         togglePassword.addEventListener('click', function () {
-            // Alternar tipo de input
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
-            // Alternar icono
             this.classList.toggle('bi-eye');
             this.classList.toggle('bi-eye-slash');
         });
@@ -434,7 +423,6 @@
             modal.classList.remove('active');
             alertBox.classList.add('hidden');
             form.reset();
-            // Resetear ojo
             passwordInput.setAttribute('type', 'password');
             togglePassword.classList.remove('bi-eye');
             togglePassword.classList.add('bi-eye-slash');
@@ -495,35 +483,28 @@
                     data = await registerUser(nombre, email, password);
                 }
                 
-                // CRÍTICO: Comprobamos que el token exista antes de intentar usarlo
                 if (!data || !data.token) {
                      throw new Error('Respuesta exitosa, pero el token de sesión está vacío. Intenta de nuevo.');
                 }
                 
-                // Si el login/registro fue exitoso, el API devuelve el token
                 localStorage.setItem('userToken', data.token);
                 
-                // CRÍTICO: Forzar el cierre del modal y mostrar éxito visual antes de redirigir
                 btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> ¡Éxito!';
                 btn.style.backgroundColor = '#10b981';
                 closeAuth(); 
                 
-                // CRÍTICO: Pausa la redirección (100ms) para asegurar la persistencia en LocalStorage
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 100); 
 
             } catch (error) {
-                // Si es un error de token/sesión que lleva a la redirección, api.js ya lo manejó
                 if (!error.message.includes('Sesión expirada')) {
                     alertBox.innerText = error.message;
                     alertBox.classList.remove('hidden');
                 }
-                    
-                // Restablece el botón (asegura que no se quede colgado)
                 btn.disabled = false;
                 btn.innerText = originalText;
-                btn.style.backgroundColor = ''; // Restaura el color
+                btn.style.backgroundColor = ''; 
             }
         });
 

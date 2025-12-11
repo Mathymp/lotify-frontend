@@ -10,11 +10,11 @@
     <link rel="stylesheet" href="css/style.css">
     
     <style>
-        /* CLASES DE CONTROL DE ROL - CRÍTICO */
+        
         .admin-only { display: none !important; }
         .admin-only-menu { display: none !important; }
 
-        /* ESTILOS DE TARJETAS Y ACCIONES */
+        
         .projects-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -223,7 +223,7 @@
             border-color: #fca5a5 !important;
         }
         
-        /* TARJETA NUEVO PROYECTO */
+        
         .new-project-card { 
             display: flex;
             flex-direction: column;
@@ -263,7 +263,7 @@
             color: inherit;
         }
 
-        /* HEADER DEL DASHBOARD - CORREGIDO */
+        
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -280,7 +280,7 @@
             margin: 0;
         }
         
-        /* BOTÓN NUEVO PROYECTO - CORREGIDO Y MEJORADO */
+        
         .btn-new-project {
             display: inline-flex;
             align-items: center;
@@ -313,7 +313,7 @@
             font-size: 1rem;
         }
 
-        /* ESTILOS MODALES */
+        
         .modal-overlay { 
             display: flex; 
             align-items: center; 
@@ -392,7 +392,7 @@
             flex: 1;
         }
         
-        /* ICONOS PARA MODALES DE EDICIÓN/CREACIÓN */
+        
         #modal-title::before {
             font-family: "bootstrap-icons";
             font-size: 1.2em;
@@ -408,7 +408,7 @@
             color: #8b5cf6;
         }
         
-        /* ESTILOS MODAL ELIMINAR */
+        
         #modal-delete .modal-card { 
             max-width: 420px; 
         }
@@ -485,7 +485,7 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
         
-        /* ESTILOS MODAL COMPARTIR */
+        
         #modal-share .modal-card { 
             max-width: 520px; 
         }
@@ -557,7 +557,7 @@
             min-height: 18px; 
         }
         
-        /* SUBIDA DE ARCHIVOS */
+        
         .file-upload-container { 
             border: 2px dashed #cbd5e1; 
             border-radius: 10px; 
@@ -600,7 +600,7 @@
             pointer-events: none; 
         }
         
-        /* MENSAJE DE ERROR DE TAMAÑO DE ARCHIVO */
+        
         .file-size-error {
             display: none;
             color: #ef4444;
@@ -623,7 +623,7 @@
             font-size: 1rem;
         }
         
-        /* ANIMACIONES */
+       
         @keyframes modalAppear {
             from { 
                 opacity: 0; 
@@ -641,7 +641,7 @@
             75% { transform: translateX(5px); }
         }
         
-        /* ESTILOS DE FORMULARIO */
+        
         .input-group {
             margin-bottom: 20px;
         }
@@ -681,7 +681,7 @@
             resize: vertical;
         }
         
-        /* MODAL FOOTER */
+        
         .modal-footer {
             padding: 20px 24px;
             border-top: 1px solid #e2e8f0;
@@ -708,7 +708,7 @@
             border-color: #cbd5e1;
         }
         
-        /* BOTÓN DESHABILITADO POR ARCHIVO GRANDE */
+        
         .btn-disabled-large-file {
             background: #94a3b8 !important;
             color: white !important;
@@ -721,7 +721,7 @@
             box-shadow: none !important;
         }
         
-        /* RESPONSIVE */
+        
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
@@ -887,6 +887,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div id="file-size-error" class="file-size-error">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <span id="file-size-error-text">El archivo es demasiado grande. El tamaño máximo es 10 MB.</span>
@@ -925,17 +926,15 @@
         const form = document.getElementById('project-form'); 
         let currentProjectsData = []; 
         let currentUserRole = 'vendedor';
-        let hasLargeFile = false; // Variable para controlar si hay archivo grande
+        let hasLargeFile = false; 
 
         const token = localStorage.getItem('userToken');
         if(!token) window.location.href = 'index.html';
         
-        // 1. CARGA DE PERFIL (SOLUCIÓN DEL PROBLEMA: USAR API.JS)
-        async function loadProfileAndProjects() {
-            try {
-                // PRIMERO: Cargar perfil usando la API (ya tiene la URL correcta)
-                const user = await getMe(); 
-                
+        // CORRECCIÓN: Usar API_URL importada de api.js
+        fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(user => {
                 document.getElementById('user-name-display').innerText = user.nombre_usuario || 'Usuario';
                 currentUserRole = user.rol || 'vendedor'; 
                 document.getElementById('user-role-display').innerText = currentUserRole === 'admin' ? 'Administrador' : 'Vendedor';
@@ -944,31 +943,9 @@
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-only'));
                     document.querySelectorAll('.admin-only-menu').forEach(el => el.classList.remove('admin-only-menu'));
                 }
-                
-                // SEGUNDO: Cargar proyectos (se hace inmediatamente después de cargar el perfil)
                 loadProjects();
-
-            } catch (error) {
-                // Si falla la carga del perfil (token expirado, etc.), redirigimos al login.
-                console.error("Error al cargar perfil:", error);
-                if (!error.message.includes('Sesión requerida')) {
-                    alert("Error crítico de sesión. Por favor, reingresa.");
-                    localStorage.removeItem('userToken'); 
-                    window.location.href = 'index.html';
-                }
-            }
-        }
-        
-        // Función auxiliar para obtener perfil (debe estar en api.js, si no lo creamos)
-        // Ya que no tengo acceso a crearla en api.js directamente, la simulamos o la definimos si no está.
-        // Asumiendo que existe una función getMe() que hace el fetch a /auth/me
-        
-        // Si getMe no está en api.js, deberías añadirla a api.js:
-        /*
-        async function getMe() {
-            return await safeFetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
-        }
-        */
+            })
+            .catch(err => console.error("Error perfil", err));
 
         logoutBtn.addEventListener('click', () => { 
             localStorage.removeItem('userToken'); 
@@ -982,15 +959,12 @@
             const editIdInput = document.getElementById('edit-project-id');
             const fileSizeError = document.getElementById('file-size-error');
             
-            // Resetear estado del formulario
             form.reset();
             document.getElementById('current-image-bg').style.display = 'none';
             hasLargeFile = false;
             
-            // Ocultar mensaje de error de archivo grande
             fileSizeError.classList.remove('show');
             
-            // Restaurar contenido de subida
             document.getElementById('default-upload-content').innerHTML = `
                 <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #94a3b8; margin-bottom: 8px;"></i>
                 <div style="font-weight: 600; color: #64748b; text-align: center;">
@@ -999,11 +973,9 @@
                 </div>
             `;
             
-            // Restaurar botón de guardar
             saveBtn.disabled = false;
             saveBtn.classList.remove('btn-disabled-large-file');
             
-            // Agregar data-mode para mostrar iconos diferentes
             title.setAttribute('data-mode', mode);
             
             if(mode === 'edit' && projectId) {
@@ -1035,30 +1007,24 @@
             const fileSizeErrorText = document.getElementById('file-size-error-text');
             const saveBtn = document.getElementById('save-btn');
             
-            // Ocultar mensaje de error por defecto
             fileSizeError.classList.remove('show');
             hasLargeFile = false;
             
             if(input.files && input.files[0]) {
                 const file = input.files[0];
-                const maxSize = 10 * 1024 * 1024; // 10 MB en bytes
+                const maxSize = 10 * 1024 * 1024; 
                 
-                // Verificar tamaño del archivo
                 if (file.size > maxSize) {
-                    // Mostrar mensaje de error
                     fileSizeErrorText.textContent = `El archivo es demasiado grande (${formatFileSize(file.size)}). El tamaño máximo es 10 MB.`;
                     fileSizeError.classList.add('show');
                     
-                    // Deshabilitar botón de guardar
                     saveBtn.disabled = true;
                     saveBtn.classList.add('btn-disabled-large-file');
                     saveBtn.innerHTML = '<i class="bi bi-exclamation-circle"></i> Archivo muy grande';
                     hasLargeFile = true;
                     
-                    // Limpiar el input de archivo
                     input.value = '';
                     
-                    // Restaurar contenido de subida
                     document.getElementById('default-upload-content').innerHTML = `
                         <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: #ef4444; margin-bottom: 8px;"></i>
                         <div style="font-weight: 600; color: #ef4444; text-align: center;">
@@ -1069,7 +1035,6 @@
                     return;
                 }
                 
-                // Si el archivo es válido, habilitar el botón de guardar
                 saveBtn.disabled = false;
                 saveBtn.classList.remove('btn-disabled-large-file');
                 
@@ -1094,7 +1059,6 @@
             }
         }
         
-        // Función para formatear el tamaño del archivo
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -1103,7 +1067,6 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // --- FUNCIÓN COPIAR AL PORTAPAPELES ---
         function copyToClipboard(elementId, feedbackId) {
             const element = document.getElementById(elementId);
             element.select();
@@ -1115,10 +1078,8 @@
             }, 2000);
         }
 
-        // --- FUNCIÓN ABRIR MODAL COMPARTIR ---
         function openShareModal(slug) {
-            // FIX CRÍTICO: Eliminamos el prefijo /frontend/ de la URL pública
-            const publicLink = `${window.location.origin}/public.html?s=${slug}`;
+            const publicLink = `${window.location.origin}/frontend/public.html?s=${slug}`;
             const iframeCode = `<iframe src="${publicLink}" width="100%" height="600px" frameborder="0" style="border: none;"></iframe>`;
             
             document.getElementById('share-link-input').value = publicLink;
@@ -1161,15 +1122,6 @@
                     `;
                     return;
                 }
-                
-                if (currentProjectsData.length === 0 && currentUserRole === 'admin') {
-                    grid.innerHTML += `
-                        <div style="grid-column: 1/-1; text-align:center; padding: 30px 20px; color: #64748b;">
-                            <p>¡Crea tu primer proyecto haciendo clic en el botón de arriba!</p>
-                        </div>
-                    `;
-                }
-
 
                 currentProjectsData.forEach(p => {
                     const card = document.createElement('div'); 
@@ -1179,8 +1131,7 @@
                         month: 'short',
                         year: 'numeric'
                     });
-                    // FIX CRÍTICO: publicLink ya no tiene /frontend/
-                    const publicLink = `${window.location.origin}/public.html?s=${p.slug_publico}`;
+                    const publicLink = `${window.location.origin}/frontend/public.html?s=${p.slug_publico}`;
                     
                     let imageHTML = '';
                     if (p.imagen_360_url) {
@@ -1194,14 +1145,11 @@
                         `;
                     }
 
-                    // BOTONES DINÁMICOS SEGÚN ROL
                     let mainButton = '';
                     let actionButtonsHTML = '';
                     let targetClickURL = '';
 
                     if (currentUserRole === 'admin') {
-                        // ADMIN: Editor (visor.html) + Datos + Ver Público + Borrar
-                        // FIX: visor.html tampoco lleva /frontend/
                         mainButton = `
                             <a href="visor.html?projectId=${p.id}" class="btn-card-action btn-editor-blue">
                                 <i class="bi bi-pencil-fill"></i> Editor 360°
@@ -1212,7 +1160,6 @@
                             </button>`;
                         targetClickURL = `visor.html?projectId=${p.id}`;
                     } else {
-                        // VENDEDOR: Ver Público (public.html)
                         mainButton = `
                             <a href="${publicLink}" target="_blank" class="btn-card-action btn-visor-green">
                                 <i class="bi bi-eye-fill"></i> Ver Público
@@ -1265,7 +1212,6 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
-            // Validar si hay un archivo grande antes de enviar
             if (hasLargeFile) {
                 alert('Por favor, selecciona un archivo menor a 10 MB antes de guardar.');
                 return;
@@ -1279,11 +1225,10 @@
                 const fd = new FormData(form); 
                 const id = document.getElementById('edit-project-id').value;
                 
-                // Verificar tamaño del archivo nuevamente antes de enviar
                 const fileInput = document.getElementById('file-input');
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
-                    const maxSize = 10 * 1024 * 1024; // 10 MB
+                    const maxSize = 10 * 1024 * 1024; 
                     
                     if (file.size > maxSize) {
                         throw new Error('El archivo es demasiado grande. Máximo 10 MB.');
@@ -1323,9 +1268,6 @@
                 alert('Error al eliminar: ' + error.message);
             }
         }
-        
-        // Ejecución inicial: Llama a la función que inicia el flujo
-        loadProfileAndProjects();
     </script>
 </body>
 </html>

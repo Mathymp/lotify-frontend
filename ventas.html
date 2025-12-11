@@ -11,13 +11,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
-        /* MODALES PREMIUM */
         .modal-overlay { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); align-items: flex-start; padding-top: 5vh; }
         .modal-card { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); max-height: 90vh; display: flex; flex-direction: column; }
         .modal-header { flex-shrink: 0; }
         .modal-body { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
 
-        /* Estilos específicos ventas */
         .btn-icon-info {
             width: 34px; height: 34px; border-radius: 8px; border: none; cursor: pointer;
             background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center;
@@ -34,7 +32,6 @@
 
         .admin-only { display: none !important; }
         
-        /* ... resto de estilos de ventas.html original ... */
         .switch-group { background: #f1f5f9; padding: 4px; border-radius: 12px; display: flex; margin-bottom: 20px; gap: 5px; }
         .switch-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
         .switch-btn.active { box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: white; }
@@ -155,7 +152,6 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script> 
     <script src="js/api.js"></script>
     <script>
-        const API_URL = 'https://lotify-backend.onrender.com/api'; // Inyección de URL de Render
         const token = localStorage.getItem('userToken');
         if(!token) window.location.href = 'index.html';
 
@@ -166,13 +162,12 @@
         let currentUserRole = 'vendedor';
 
         // 1. CARGAR PERFIL
-        // FIX: Reemplazar fetch local por fetch a API_URL
         fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(r => r.json())
             .then(user => {
                 currentUserRole = user.rol || 'vendedor';
-                // FIX SIDEBAR: Ocultar si no es admin
                 if(currentUserRole !== 'admin') {
+                    // Ocultar elementos admin si existieran (ej. eliminar)
                     document.querySelectorAll('.admin-only-menu').forEach(el => el.style.display = 'none');
                 }
                 loadInitialData(); // Iniciar app
@@ -203,6 +198,8 @@
             document.getElementById(`modal-${id}`).classList.remove('show'); 
             if(id === 'crm') { document.getElementById('crm-form').reset(); resetFinanceFields(); }
         }
+        
+
         
         function resetFinanceFields() {
             document.getElementById('reserva-found-msg').style.display = 'none';
@@ -235,7 +232,6 @@
         }
 
         async function loadInitialData() {
-            // FIX: Reemplazar fetch local por fetch a API_URL
             const [proyectos, clientes] = await Promise.all([
                 fetch(`${API_URL}/projects`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
                 fetch(`${API_URL}/crm/clientes`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
@@ -253,7 +249,6 @@
         async function loadLotes(projectId) {
             if(!projectId) return;
             const sel = document.getElementById('select-lote'); sel.disabled = true; sel.innerHTML = '<option>Cargando...</option>';
-            // FIX: Reemplazar fetch local por fetch a API_URL
             const res = await fetch(`${API_URL}/lotes/${projectId}`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             lotesData = data.filter(l => l.tipo === 'lote');
@@ -281,7 +276,6 @@
 
             if (type === 'venta') {
                 try {
-                    // FIX: Reemplazar fetch local por fetch a API_URL
                     const res = await fetch(`${API_URL}/crm/reserva/${loteId}`, { headers: { 'Authorization': `Bearer ${token}` } });
                     const reserva = await res.json();
                     if (reserva) {
@@ -326,7 +320,6 @@
             
             if (type === 'visita') {
                 body.fecha_visita = `${document.getElementById('fecha-input').value}T${document.getElementById('hora-input').value}:00`;
-                // FIX: Reemplazar fetch local por fetch a API_URL
                 await fetch(`${API_URL}/crm/visitas`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
             } else {
                 if(!body.lote_id) return alert('Selecciona un lote.');
@@ -345,7 +338,6 @@
                     body.valor_final = body.monto_reserva; 
                 }
 
-                // FIX: Reemplazar fetch local por fetch a API_URL
                 await fetch(`${API_URL}/crm/ventas`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
             }
             closeModal('crm');
@@ -353,18 +345,13 @@
         });
 
         async function fetchAllData() {
-            try {
-                // FIX: Reemplazar fetch local por fetch a API_URL
-                const [visitas, ventas] = await Promise.all([
-                    fetch(`${API_URL}/crm/visitas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(`${API_URL}/crm/ventas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
-                ]);
-                visitasData = visitas;
-                ventasData = ventas;
-                applyFilters();
-            } catch (e) {
-                 document.getElementById('ventas-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:#ef4444;">Error al cargar datos: El servidor no responde.</td></tr>';
-            }
+            const [visitas, ventas] = await Promise.all([
+                fetch(`${API_URL}/crm/visitas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+                fetch(`${API_URL}/crm/ventas`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
+            ]);
+            visitasData = visitas;
+            ventasData = ventas;
+            applyFilters();
         }
 
         function applyFilters() {

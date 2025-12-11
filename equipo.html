@@ -37,14 +37,14 @@
         }
         .btn-danger-action:hover { background: #dc2626; }
 
-        /* Estilos Ojito Password */
+        
         .input-wrapper { position: relative; width: 100%; }
         .toggle-password-icon {
             position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
             color: #94a3b8; font-size: 1.1rem; cursor: pointer; transition: color 0.2s; z-index: 10;
         }
         .toggle-password-icon:hover { color: #2563eb; }
-        /* Ajuste para input con icono */
+        
         .styled-input-pass { padding-right: 40px !important; }
     </style>
 </head>
@@ -178,28 +178,19 @@
 
     <script src="js/api.js"></script>
     <script>
-        const API_URL = 'https://lotify-backend.onrender.com/api'; // Inyección de URL de Render
         const token = localStorage.getItem('userToken');
         if(!token) window.location.href = 'index.html';
         
         let currentUserId = null;
         let userToDeleteId = null;
-        let allUsers = []; // Cache local para edición
+        let allUsers = []; 
 
-        // 1. CARGAR PERFIL
-        // FIX: Reemplazar fetch local por fetch a API_URL
-        fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(user => {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    currentUserId = payload.id;
-                } catch(e){}
-                loadTeam(); 
-            })
-            .catch(() => {});
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            currentUserId = payload.id;
+        } catch(e){}
 
-        // --- LÓGICA DEL OJITO (PASSWORD) ---
+       
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('input-pass');
 
@@ -210,7 +201,7 @@
             this.classList.toggle('bi-eye-slash');
         });
 
-        // --- GESTIÓN DE MODALES (omitido para brevedad, asume funcionalidad correcta) ---
+        
         function openModal(type, id = null) {
             if (type === 'user') {
                 const form = document.getElementById('form-user');
@@ -223,13 +214,13 @@
                 form.reset();
                 document.getElementById('modal-alert').classList.add('hidden');
                 
-                // Reset password visibility
+                
                 passInput.setAttribute('type', 'password');
                 togglePassword.classList.remove('bi-eye');
                 togglePassword.classList.add('bi-eye-slash');
 
                 if (id) {
-                    // MODO EDICIÓN
+                    
                     const user = allUsers.find(u => u.id === id);
                     if (!user) return;
 
@@ -241,13 +232,13 @@
                     document.getElementById('input-email').value = user.email;
                     document.getElementById('input-rol').value = user.rol;
 
-                    // Ajustes de contraseña para edición
+                    
                     passInput.required = false;
                     passInput.placeholder = "Dejar vacía para mantener";
                     passLabel.innerText = "Nueva Contraseña (Opcional)";
 
                 } else {
-                    // MODO CREACIÓN
+                    
                     title.innerText = "Registrar Nuevo Miembro";
                     btn.innerText = "Crear Usuario";
                     idInput.value = "";
@@ -290,7 +281,7 @@
 
         async function loadTeam() {
             try {
-                // FIX: Reemplazar fetch local por fetch a API_URL
+                // URL dinámica usando API_URL
                 const res = await fetch(`${API_URL}/auth/team`, { 
                     headers: { 'Authorization': `Bearer ${token}` } 
                 });
@@ -305,7 +296,7 @@
                 tbody.innerHTML = '';
 
                 if(allUsers.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;">No hay usuarios.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay usuarios.</td></tr>';
                     return;
                 }
 
@@ -340,10 +331,7 @@
                     `;
                 });
 
-            } catch (e) { 
-                console.error(e); 
-                document.getElementById('team-tbody').innerHTML = `<tr><td colspan="5" style="padding:40px; text-align:center; color:#ef4444;">Error al cargar equipo: El servidor no responde.</td></tr>`;
-            }
+            } catch (e) { console.error(e); }
         }
 
         async function confirmDelete() {
@@ -353,14 +341,11 @@
             btn.innerText = '...'; btn.disabled = true;
 
             try {
-                // FIX: Reemplazar fetch local por fetch a API_URL
+                // URL dinámica usando API_URL
                 const res = await fetch(`${API_URL}/auth/team/${userToDeleteId}`, {
                     method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(!res.ok) {
-                    const json = await res.json();
-                    throw new Error(json.message || 'Error al eliminar');
-                }
+                if(!res.ok) throw new Error('Error al eliminar');
                 
                 closeModal('delete');
                 showFeedback('success', 'Eliminado', 'Usuario eliminado correctamente.');
@@ -385,15 +370,15 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                let url = `${API_URL}/auth/team`; // FIX: Usar API_URL
+                // URL dinámica usando API_URL
+                let url = `${API_URL}/auth/team`;
                 let method = 'POST';
 
                 if (editId) {
                     url += `/${editId}`;
-                    method = 'PUT'; // Cambio a PUT para editar
+                    method = 'PUT'; 
                 }
 
-                // FIX: Reemplazar fetch local por fetch a API_URL
                 const res = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -413,6 +398,7 @@
             } finally { btn.disabled = false; btn.innerText = originalText; }
         });
 
+        loadTeam();
     </script>
 </body>
 </html>
