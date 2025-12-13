@@ -2,6 +2,22 @@
 import { Viewer } from 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.7.3/index.module.js';
 import { MarkersPlugin } from 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.7.3/index.module.js';
 
+// --- 0. CAPTURA ROBUSTA DE ID ---
+const params = new URLSearchParams(window.location.search);
+// Busca 'projectId' (usado por dashboard) O 'id' (por si acaso escribes la url manual)
+const projectId = params.get('projectId') || params.get('id');
+
+// Validación inmediata
+if (!projectId) {
+    console.error("⛔ ID no encontrado en la URL.");
+    alert("Error: No se ha especificado el proyecto. Volviendo al Dashboard.");
+    window.location.href = 'dashboard.html';
+    throw new Error("Deteniendo ejecución: ID no encontrado.");
+}
+
+console.log("✅ Iniciando Editor para Proyecto ID:", projectId);
+
+
 // --- 1. ESTADO GLOBAL ---
 const state = {
     viewer: null,
@@ -23,8 +39,6 @@ const state = {
         poiText: '#ffffff'
     }
 };
-
-const projectId = new URLSearchParams(window.location.search).get('projectId');
 
 // --- 2. UTILIDADES ---
 const formatNumber = (input) => {
@@ -265,7 +279,6 @@ function updatePreview() {
     try { state.markersPlugin.removeMarker('elastic'); } catch(e){}
 
     if (state.currentPoints.length >= 2) {
-        // FIX CRÍTICO: Usar las funciones de escala correctas
         const zoom = state.viewer.getZoomLevel();
         if(state.currentMode === 'camino') {
             const w = Math.max(3, state.settings.caminoWidth * getCaminoScale(zoom));
@@ -447,13 +460,13 @@ window.updateSettings = (type) => {
             } catch(e){}
         }
     }
-    // FIX CRÍTICO: Actualizamos la previsualización al cambiar settings
     updatePreview();
 }
 
 // --- 9. INICIALIZACIÓN ---
 async function init() {
-    if(!projectId) { showDialog('error', "Error: No hay proyecto seleccionado"); return; }
+    // Si llegamos aquí y projectId sigue null, el check inicial falló o se saltó
+    if(!projectId) { return; }
     
     if (typeof window.getProjectById !== 'function') {
         console.warn("API functions not ready, waiting...");
@@ -485,7 +498,6 @@ async function init() {
                 const dest = state.activeSnapPoint ? state.activeSnapPoint : { yaw: data.yaw, pitch: data.pitch };
                 try { state.markersPlugin.removeMarker('elastic'); } catch(e){}
                 
-                // FIX: Usamos las mismas funciones de escala para la goma elástica
                 const zoom = state.viewer.getZoomLevel();
                 let strokeW, strokeC;
                 
