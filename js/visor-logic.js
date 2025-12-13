@@ -642,3 +642,4 @@ window.setPoiSize = (size, btn) => {
 };
 
 window.addEventListener('load', init);
+
