@@ -91,30 +91,49 @@
         .nano-price { font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.1; display: block; text-shadow: none !important; }
         .nano-meta { font-size: 0.7rem; color: var(--secondary); font-weight: 600; display: block; margin-top: 2px; text-shadow: none !important; }
 
-        /* BADGES (NÚMEROS) */
+        /* --- ESTILOS TRAÍDOS DEL EDITOR (VISOR.CSS) --- */
+
+        /* BADGES (NÚMEROS DE LOTE) */
         .lote-badge-wrapper { width: 0; height: 0; position: absolute; pointer-events: none; overflow: visible; z-index: 100; }
+        
         .lote-badge-content {
             position: absolute; top: 0; left: 0; transform: translate(-50%, -50%);
-            min-width: 28px; height: 28px; padding: 0 5px;
+            /* Estilo del Editor: Más grande y legible */
+            min-width: 28px; height: 28px; padding: 0 8px;
             border-radius: 50px; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
-            white-space: nowrap; pointer-events: auto; cursor: pointer; 
-            transition: transform 0.1s ease-out; text-shadow: none !important;
+            font-weight: 800; font-size: 0.9rem; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; 
+            pointer-events: auto; cursor: pointer; transition: transform 0.2s ease-out;
+            text-shadow: none !important; /* Limpieza extra */
         }
-        .lote-badge-content:hover { transform: translate(-50%, -50%) scale(1.1); z-index: 101; border-width: 2px; }
+        .lote-badge-content:hover { transform: translate(-50%, -50%) scale(1.2); z-index: 101; }
 
-        /* POI */
+        /* POI (PUNTOS DE INTERÉS) - Estilo Editor */
         .poi-wrapper { width: 0; height: 0; position: absolute; overflow: visible; pointer-events: none; }
-        .poi-content { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; width: max-content; pointer-events: auto; cursor: pointer; transition: transform 0.2s ease-out; text-shadow: none !important; }
+        .poi-content {
+            position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; width: max-content;
+            pointer-events: auto; cursor: pointer; transition: transform 0.2s ease-out;
+            text-shadow: none !important;
+        }
         .poi-head { z-index: 10; margin-bottom: -2px; transition: transform 0.2s ease-out; }
-        .poi-pill { min-width: 80px; padding: 6px 12px; border-radius: 8px; text-align: center; color: white; font-weight: 700; font-size: 0.85rem; box-shadow: 0 3px 10px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .poi-sub { font-size: 0.7rem; font-weight: 400; opacity: 0.9; margin-top: 1px; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .poi-line { width: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1; margin-bottom: -4px; }
-        .poi-anchor { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 2; }
-        .poi-content.right .poi-head { transform: translateX(25px); }
-        .poi-content.left .poi-head { transform: translateX(-25px); }
-        .poi-content.size-1 { transform: translateX(-50%) scale(0.7); transform-origin: bottom center; }
-        .poi-content.size-2 { transform: translateX(-50%) scale(0.9); transform-origin: bottom center; }
+        
+        .poi-pill {
+            min-width: 100px; padding: 8px 16px; border-radius: 12px; 
+            text-align: center; color: white; font-weight: 700; font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        
+        .poi-sub { font-size: 0.75rem; font-weight: 400; opacity: 0.95; margin-top: 2px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .poi-line { width: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1; margin-bottom: -4px; }
+        .poi-anchor { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 2; }
+        
+        /* Orientación y Tamaños */
+        .poi-content.right .poi-head { transform: translateX(30px); }
+        .poi-content.left .poi-head { transform: translateX(-30px); }
+        .poi-content.size-1 { transform: translateX(-50%) scale(0.6); transform-origin: bottom center; }
+        .poi-content.size-2 { transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
         .poi-content.size-3 { transform: translateX(-50%) scale(1.1); transform-origin: bottom center; }
 
         /* Nueva animación de entrada desde la izquierda */
@@ -227,7 +246,10 @@
                         const h = data.height || 100; const bg = data.bg || '#ef4444'; const txt = data.text || '#ffffff';
                         const sizeClass = data.size || 2; const orient = data.orient || 'right';
                         const descHtml = el.descripcion ? `<span class="poi-sub" style="color:${txt}CC">${el.descripcion}</span>` : '';
+                        
+                        // HTML COPIADO DE VISOR.CSS PARA COHERENCIA
                         const html = `<div class="poi-wrapper"><div class="poi-content ${orient} size-${sizeClass}"><div class="poi-head"><div class="poi-pill" style="background:${bg}; color:${txt};"><div style="line-height:1.2">${el.titulo}</div>${descHtml}</div></div><div class="poi-line" style="height: ${h}px; background:${bg};"></div><div class="poi-anchor" style="background:${bg};"></div></div></div>`;
+                        
                         markersPlugin.addMarker({ id: `poi_${el.id}`, position: { yaw: data.yaw, pitch: data.pitch }, html: html, anchor: 'center center', data: { tipo: 'poi' } });
                     } 
                     else if (el.tipo === 'camino') {
@@ -249,7 +271,10 @@
                         const center = getPolygonCenter(path);
                         if(center) {
                             let badgeStyle = el.estado_id === 1 ? 'background: white; color: #1e293b; border: 2px solid white;' : `background: ${color}; border: 2px solid white; color: white;`;
+                            
+                            // HTML ACTUALIZADO AL ESTILO DE VISOR.CSS
                             const badgeHtml = `<div class="lote-badge-wrapper"><div class="lote-badge-content" style="${badgeStyle}">${el.numero_lote}</div></div>`;
+                            
                             markersPlugin.addMarker({ 
                                 id: `badge_${el.id}`, position: { yaw: center[0], pitch: center[1] }, 
                                 html: badgeHtml, anchor: 'center center', 
